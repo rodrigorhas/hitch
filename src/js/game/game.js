@@ -1,49 +1,49 @@
-import { Player } from './player.js'
-import { Engine } from './engine.js'
-import { Input } from './input.js'
+import { Player } from './entities/player/Player.js'
+import { Input } from '../engine/managers/Input.js'
+import { Engine } from "../engine/Engine.js";
 
 const input = new Input();
 
 const game = new Engine({
     element: 'canvas',
-    frameRate: 60,
     render,
     update,
     input
 })
 
 const entities = [
-    new Player({
+    Player.make({
         name: 'luis',
         color: 'blue',
-        speed: -2,
+        speed: 0.25,
         position: {
             x: 200,
             y: 20
         }
     }),
-    new Player({
-        name: 'rodrigo',
-        color: 'red',
-        speed: 2,
-        position: {
-            x: 200,
-            y: 40
-        },
-    })
 ];
-
-// MAIN LOOP STEPS
 
 function render (ctx) {
     entities.forEach((entity) => {
+        if (!entity.state.visible) {
+            return;
+        }
+
         entity.render(ctx)
+
+        if (entity.renderComponents) {
+            entity.renderComponents(game);
+        }
     })
 }
 
 function update () {
     entities.forEach((entity) => {
         entity.update()
+
+        if (entity.updateComponents) {
+            entity.updateComponents(game);
+        }
     })
 }
 

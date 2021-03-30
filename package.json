@@ -4,7 +4,8 @@
   "description": "2d game",
   "main": "src/index.html",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "serve": "npx serve src"
   },
   "repository": {
     "type": "git",
