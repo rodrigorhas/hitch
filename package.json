@@ -1,0 +1,22 @@
+{
+  "name": "hitch",
+  "version": "1.0.0",
+  "description": "2d game",
+  "main": "src/index.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rodrigorhas/hitch.git"
+  },
+  "keywords": [
+    "game"
+  ],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rodrigorhas/hitch/issues"
+  },
+  "homepage": "https://github.com/rodrigorhas/hitch#readme"
+}
