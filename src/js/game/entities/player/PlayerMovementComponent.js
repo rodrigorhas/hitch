@@ -1,4 +1,4 @@
-import { PositionComponent } from "../../components/PositionComponent.js";
+import { PositionComponent } from "../../../engine/components/PositionComponent.js";
 
 export class PlayerMovementComponent extends PositionComponent {
     constructor(position) {

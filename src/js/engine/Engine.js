@@ -1,5 +1,5 @@
-import { Input } from './Input.js'
-import { Time } from "./Time.js";
+import { Input } from './managers/Input.js'
+import { Time } from "./managers/Time.js";
 
 /**
  * @constructor {Time} options.time

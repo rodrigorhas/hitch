@@ -1,6 +1,6 @@
-import { Player } from './entities/player/player.js'
-import { Engine } from './Engine.js'
-import { Input } from './Input.js'
+import { Player } from './entities/player/Player.js'
+import { Input } from '../engine/managers/Input.js'
+import { Engine } from "../engine/Engine.js";
 
 const input = new Input();
 

@@ -1,6 +1,6 @@
-import { Entity } from '../Entity.js'
-import { fastRandomNumber, randomHash, randomHex } from "../../Random.js";
+import { fastRandomNumber, randomHash, randomHex } from "../../../engine/support/Random.js";
 import { PlayerMovementComponent } from "./PlayerMovementComponent.js";
+import { Entity } from "../../../engine/entities/Entity.js";
 
 export class Player extends Entity {
     constructor(options) {
