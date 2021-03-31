@@ -27,6 +27,10 @@ game.ecs.systems
     .register(PlayerControllerSystem)
 
 function render(ctx) {
+    const text = 'Entities: ' + game.ecs.entities.count();
+
+    ctx.fillStyle = 'black'
+    ctx.fillText(text, 10, 20, 60);
 }
 
 function update() {
