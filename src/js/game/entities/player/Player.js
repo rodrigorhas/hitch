@@ -1,6 +1,9 @@
 import { fastRandomNumber, randomHash, randomHex } from "../../../engine/support/Random.js";
-import { PlayerMovementComponent } from "./PlayerMovementComponent.js";
 import { Entity } from "../../../engine/entities/Entity.js";
+import { BoxShape } from "../../components/BoxShape.js";
+import { Position } from "../../components/Position.js";
+import { Controllable } from "../../components/tags/Controllable.js";
+import { RigidBody } from "../../components/RigidBody.js";
 
 export class Player extends Entity {
     constructor(options) {
@@ -14,25 +17,16 @@ export class Player extends Entity {
     }
 
     static make(options) {
-        options.components = options.components || {};
+        const entity = new this(options)
 
-        if (!options.components.PositionComponent) {
-            options.components.PositionComponent = new PlayerMovementComponent(options.position);
-        }
+        const { width, height, color, speed, position } = options;
 
-        return new this(options)
-    }
+        entity.addComponent(BoxShape, { width, height, color })
+        entity.addComponent(Position, { position })
+        entity.addComponent(RigidBody, { speed })
+        entity.addComponent(Controllable)
 
-    render(ctx) {
-        ctx.fillStyle = this.state.color;
-
-        ctx.fillRect(
-            this.state.position.x, this.state.position.y,
-            this.state.width, this.state.height
-        );
-    }
-
-    update() {
+        return entity;
     }
 }
 

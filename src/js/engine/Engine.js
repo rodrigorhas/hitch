@@ -1,40 +1,54 @@
 import { Input } from './managers/Input.js'
 import { Time } from "./managers/Time.js";
+import { ECS } from "./ecs/ECS.js";
 
-/**
- * @constructor {Time} options.time
- */
+const noop = () => {
+};
+
 export class Engine {
+    #render;
+    #update;
+    #mountElement;
+
+    /**
+     * @param {any} options
+     * @param {Time?} options.time
+     * @param {Input?} options.input
+     * @param {ECS?} options.ecs
+     */
     constructor(options) {
-        this.options = options;
+        this.#render = options.render || noop;
+        this.#update = options.update || noop;
 
-        const { canvas, context, clearCanvas } = this.createCanvas()
+        this.#mountElement = options.element;
 
-        this.time = new Time()
-        this.input = this.options.input;
+        this.#configureCanvas()
+
+        this.#configureTime()
+        this.#configureInput()
+        this.#configureECS()
 
         this.state = {
-            requestId: undefined
+            requestId: undefined,
+            running: false
         }
-
-        canvas.clearCanvas = clearCanvas;
-        canvas.ctx = context;
-        this.canvas = canvas;
     }
 
     gameLoop(canvas) {
         canvas.clearCanvas()
 
-        this.options.render.call(this, canvas.ctx)
+        this.time.update(() => {
+            this.#render.call(this, canvas.ctx)
+            this.#update.call(this)
 
-        this.time.update()
-        this.options.update.call(this)
+            this.ecs.update(this)
+        })
     }
 
     start() {
-        if (this.options.input instanceof Input) {
+        if (this.input instanceof Input) {
             // start input
-            this.options.input.start()
+            this.input.start()
         }
 
         const mainLoop = () => {
@@ -45,15 +59,18 @@ export class Engine {
         }
 
         mainLoop();
+
+        this.state.running = true;
     }
 
     stop() {
         window.cancelAnimationFrame(this.state.requestId)
         this.state.requestId = undefined
+        this.state.running = false;
     }
 
     createCanvas () {
-        const canvas = document.getElementById(this.options.element);
+        const canvas = document.getElementById(this.#mountElement);
         const context = canvas.getContext('2d')
 
         function clearCanvas() {
@@ -65,5 +82,26 @@ export class Engine {
             context,
             clearCanvas
         }
+    }
+
+    #configureCanvas() {
+        const { canvas, context, clearCanvas } = this.createCanvas()
+
+        canvas.clearCanvas = clearCanvas;
+        canvas.ctx = context;
+
+        this.canvas = canvas;
+    }
+
+    #configureTime() {
+        this.time = this.time || new Time()
+    }
+
+    #configureInput() {
+        this.input = this.input || new Input();
+    }
+
+    #configureECS() {
+        this.ecs = this.ecs || new ECS();
     }
 }
