@@ -2,11 +2,14 @@ export class Time {
     lastUpdate = 0;
     timeScale = 1;
 
-    update () {
-        const currentTime = new Date().getTime();
-        const delta = currentTime - this.lastUpdate;
+    update(run) {
+        const time = performance.now();
+        let delta = time - this.lastUpdate;
 
-        this.lastUpdate = new Date().getTime()
         this.deltaTime = delta * this.timeScale;
+
+        run()
+
+        this.lastUpdate = time;
     }
 }
