@@ -1,4 +1,4 @@
-import { fastRandomNumber, randomHash, randomHex } from "../../../engine/support/Random.js";
+import { fastRandomNumber, randomHash, randomHex, randomNumber } from "../../../engine/support/Random.js";
 import { Entity } from "../../../engine/entities/Entity.js";
 import { BoxShape } from "../../components/BoxShape.js";
 import { Position } from "../../components/Position.js";
@@ -22,7 +22,7 @@ export class Player extends Entity {
         const { width, height, color, speed, position } = options;
 
         entity.addComponent(BoxShape, { width, height, color })
-        entity.addComponent(Position, { position })
+        entity.addComponent(Position, position)
         entity.addComponent(RigidBody, { speed })
         entity.addComponent(Controllable)
 
@@ -34,10 +34,10 @@ export const randomPlayers = (game, min, max) => Array(fastRandomNumber(min, max
     return Player.make({
         name: randomHash(),
         color: randomHex(),
-        speed: fastRandomNumber(2, 5),
+        speed: randomNumber(0.1, 1),
         position: {
             x: fastRandomNumber(0, game.canvas.width - 20),
-            y: fastRandomNumber(0, game.canvas.width - 20)
+            y: fastRandomNumber(0, game.canvas.height - 20)
         },
     })
 })
