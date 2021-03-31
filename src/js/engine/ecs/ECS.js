@@ -45,6 +45,14 @@ class ECSEntityManager {
         }
     }
 
+    count() {
+        return this.#entities.length;
+    }
+
+    get() {
+        return this.#entities.slice();
+    }
+
     add(...entities) {
         entities = entities.flat(Infinity);
         this.#entities.push(...entities);
