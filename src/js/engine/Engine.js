@@ -38,10 +38,10 @@ export class Engine {
         canvas.clearCanvas()
 
         this.time.update(() => {
+            this.ecs.update(this)
+
             this.#render.call(this, canvas.ctx)
             this.#update.call(this)
-
-            this.ecs.update(this)
         })
     }
 
