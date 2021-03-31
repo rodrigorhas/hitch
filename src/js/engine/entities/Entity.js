@@ -1,37 +1,24 @@
+import { randomHash } from "../support/Random.js";
+
 export class Entity {
-    components = new Map();
+    #components = new Map();
 
     constructor(options) {
         this.state = {
+            id: randomHash(8),
             name: options.name,
-            position: options.position || { x: 0, y: 0 },
-            visible: options.visible !== undefined ? options.visible : true,
-            width: options.width || 20,
-            height: options.height || 20,
-        }
-
-        if (options.components) {
-            Object.entries(options.components).forEach(([key, component]) => {
-                this.components.set(key, component)
-            })
         }
     }
 
-    render(ctx) {
+    addComponent(component, data) {
+        this.#components.set(component, new component(data));
     }
 
-    update() {
+    hasComponent(component) {
+        return this.#components.has(component);
     }
 
-    updateComponents (options) {
-        this.components.forEach((component) => {
-            component.update(this.state, options)
-        })
-    }
-
-    renderComponents (options) {
-        this.components.forEach((component) => {
-            component.render(this.state, options)
-        })
+    getComponent(component) {
+        return this.#components.get(component);
     }
 }
