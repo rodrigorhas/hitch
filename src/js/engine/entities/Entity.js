@@ -3,11 +3,9 @@ import { randomHash } from "../support/Random.js";
 export class Entity {
     #components = new Map();
 
-    constructor(options) {
-        this.state = {
-            id: randomHash(8),
-            name: options.name,
-        }
+    constructor({ id, name }) {
+        this.id = id || randomHash(8);
+        this.name = name || this.id;
     }
 
     addComponent(component, data) {
