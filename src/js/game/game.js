@@ -1,15 +1,7 @@
 import { Player } from './entities/player/Player.js'
-import { Input } from '../engine/managers/Input.js'
 import { Engine } from "../engine/Engine.js";
-
-const input = new Input();
-
-const game = new Engine({
-    element: 'canvas',
-    render,
-    update,
-    input
-})
+import { RenderSystem } from "./systems/RenderSystem.js";
+import { PlayerControllerSystem } from "./systems/PlayerControllerSystem.js";
 
 const entities = [
     Player.make({
@@ -23,28 +15,21 @@ const entities = [
     }),
 ];
 
-function render (ctx) {
-    entities.forEach((entity) => {
-        if (!entity.state.visible) {
-            return;
-        }
+const game = new Engine({
+    element: 'canvas',
+    render,
+    update,
+})
 
-        entity.render(ctx)
+game.ecs.entities.add(entities)
+game.ecs.systems
+    .register(RenderSystem)
+    .register(PlayerControllerSystem)
 
-        if (entity.renderComponents) {
-            entity.renderComponents(game);
-        }
-    })
+function render(ctx) {
 }
 
-function update () {
-    entities.forEach((entity) => {
-        entity.update()
-
-        if (entity.updateComponents) {
-            entity.updateComponents(game);
-        }
-    })
+function update() {
 }
 
 game.start()
