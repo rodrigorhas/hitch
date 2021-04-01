@@ -14,9 +14,21 @@ body {
     height: 100vh;
 }
 
+#game {
+    border: 1px solid #333;
+}
+
 canvas {
     display: block;
     margin: 0 auto;
     background: #f2f2f2;
-    border: 1px solid #333;
+}
+
+image, canvas {
+    user-select: none;
+    -ms-user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-user-drag: none;
 }

@@ -2,6 +2,10 @@ import { Input } from './managers/Input.js'
 import { Time } from "./managers/Time.js";
 import { ECS } from "./ecs/ECS.js";
 
+/**
+ * @typedef {HTMLCanvasElement & {ctx: CanvasRenderingContext2D}} EngineCanvas
+ */
+
 const noop = () => {
 };
 
@@ -9,6 +13,12 @@ export class Engine {
     #render;
     #update;
     #mountElement;
+
+
+    /**
+     * @type {EngineCanvas} canvas
+     */
+    canvas;
 
     /**
      * @param {any} options
@@ -42,13 +52,15 @@ export class Engine {
 
             this.#render.call(this, canvas.ctx)
             this.#update.call(this)
+
+            this.input.update(this)
         })
     }
 
     start() {
         if (this.input instanceof Input) {
             // start input
-            this.input.start()
+            this.input.start(this)
         }
 
         const mainLoop = () => {
@@ -70,8 +82,19 @@ export class Engine {
     }
 
     createCanvas () {
+        /**
+         * @type {EngineCanvas|null}
+         */
         const canvas = document.getElementById(this.#mountElement);
         const context = canvas.getContext('2d')
+
+        context.imageSmoothingEnabled = false;
+
+        canvas.onselectstart = function () {
+            return false;
+        };
+
+        canvas.style.imageRendering = 'pixelated';
 
         function clearCanvas() {
             context.clearRect(0, 0, canvas.width, canvas.height)

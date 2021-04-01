@@ -15,6 +15,10 @@ class ECSSystemManager {
         return this.#systems.delete(system);
     }
 
+    /**
+     * @param {Engine} game
+     * @param {ECSEntityManager} entities
+     */
     update(game, entities) {
         const systems = Array.from(this.#systems.values());
         systems.sort((systemA, systemB) => systemA.priority - systemB.priority)
@@ -27,8 +31,14 @@ class ECSSystemManager {
 }
 
 class ECSEntityManager {
+    /**
+     * @type {Entity[]}
+     */
     #entities = [];
 
+    /**
+     * @param {Object.<string, {components: Component[], results: Entity[]}>} queries
+     */
     query(queries) {
         // TODO: implement a QueryManager to cache queries
         for (const queryName in queries) {
@@ -43,6 +53,8 @@ class ECSEntityManager {
                     )
             }
         }
+
+        return queries;
     }
 
     count() {

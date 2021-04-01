@@ -1,27 +1,32 @@
-export function Input () {
-    this.state = {
-        started: false
+import { KeyboardInput } from "./Input/KeyboardInput.js";
+import { MouseInput } from "./Input/MouseInput.js";
+
+export class Input {
+    initialized = false;
+
+    start(game) {
+        if (this.initialized) {
+            return;
+        }
+
+        this.initialized = true;
+
+        this.#configureKeyboardInput(game);
+        this.#configureMouseInput(game);
     }
 
-    this.pressedKeys = {};
-}
-
-Input.prototype.start = function () {
-    if (this.state.started) {
-        return;
+    #configureKeyboardInput(game) {
+        this.keyboard = new KeyboardInput();
+        this.keyboard.setup(game)
     }
 
-    this.state.started = true;
-
-    document.body.onkeypress = (event) => {
-        this.pressedKeys[event.key] = true;
+    #configureMouseInput(game) {
+        this.mouse = new MouseInput();
+        this.mouse.setup(game)
     }
 
-    document.body.onkeyup = (event) => {
-        this.pressedKeys[event.key] = false;
+    update(game) {
+        this.mouse.update(game)
+        this.keyboard.update(game)
     }
-}
-
-Input.prototype.isPressed = function (key) {
-    return this.pressedKeys[key]
 }

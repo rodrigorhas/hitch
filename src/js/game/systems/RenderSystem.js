@@ -1,26 +1,22 @@
 import { System } from "../../engine/ecs/System.js";
-import { BoxShape } from "../components/BoxShape.js";
+import { Shape } from "../components/Shapes/Shape.js";
 import { Position } from "../components/Position.js";
+import { Collider } from "../../engine/support/Collider/Collider.js";
 
 export class RenderSystem extends System {
     queries = {
         renderables: {
-            components: [ BoxShape ]
+            components: [ Shape, Collider, Position ]
         }
     }
 
     execute({ canvas }) {
         const { ctx } = canvas;
+
         for (const entity of this.queries.renderables.results) {
-            const position = entity.getComponent(Position)
-            const shape = entity.getComponent(BoxShape)
+            const shape = entity.getComponent(Shape)
 
-            ctx.fillStyle = shape.color;
-
-            ctx.fillRect(
-                position.x, position.y,
-                shape.width, shape.height
-            );
+            shape.render(ctx, entity)
         }
     }
 }
