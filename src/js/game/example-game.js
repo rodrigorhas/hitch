@@ -1,36 +1,24 @@
-// game
+import { Player } from './entities/player/Player.js'
 import { Engine } from "../engine/Engine.js";
-import { CollisionSystem } from "./systems/CollisionSystem.js";
 import { RenderSystem } from "./systems/RenderSystem.js";
-import { TooltipSystem } from "./systems/TooltipSystem.js";
 import { PlayerControllerSystem } from "./systems/PlayerControllerSystem.js";
+import { TooltipSystem } from "./systems/TooltipSystem.js";
+import { CollisionSystem } from "./systems/CollisionSystem.js";
 
-// project
-import { sampleRooms } from "./procedural/room.js";
-import { sampleBathrooms } from "./procedural/bathrooms.js";
-import { createHouse } from "./procedural/house.js";
+const entities = [
+    Player.make({
+        name: 'luis',
+        color: 'cornflowerblue',
+        speed: 0.15,
+        radius: 10,
+        position: {
+            x: 0,
+            y: 0
+        }
+    }),
+];
 
-const config = {
-    area: {
-        width: 20,
-        height: 20
-    },
-    slots: {
-        rooms: 3,
-        bathrooms: 2,
-    }
-}
-
-const presets = {
-    rooms: sampleRooms,
-    bathrooms: sampleBathrooms,
-}
-
-const house = createHouse(config, presets)
-
-console.log(house)
-
-const game = Engine({
+const game = new Engine({
     element: 'canvas',
     render,
     update,
