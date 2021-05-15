@@ -9,6 +9,8 @@ import { Vector2 } from "../../../engine/support/Vectors/Vector2.js";
 import { Material } from "../../components/Material.js";
 import { CircleShape } from "../../components/Shapes/CircleShape.js";
 import { CircleCollider } from "../../../engine/support/Collider/CircleCollider.js";
+import { BoxShape } from "../../components/Shapes/BoxShape.js";
+import { BoxCollider } from "../../../engine/support/Collider/BoxCollider.js";
 
 export class Player extends Entity {
     constructor(options) {
@@ -27,11 +29,14 @@ export class Player extends Entity {
         const { width, height, color, speed, position, radius } = options;
 
         entity.addComponent(Material, { color })
-        // entity.addComponent(BoxShape, { width, height })
-        // entity.addComponent(BoxCollider, { w: width, h: height })
 
-        entity.addComponent(CircleShape, { radius })
-        entity.addComponent(CircleCollider, { r: radius })
+        if (Math.random() > 0.5) {
+            entity.addComponent(BoxShape, { width, height })
+            entity.addComponent(BoxCollider, { w: width, h: height })
+        } else {
+            entity.addComponent(CircleShape, { radius })
+            entity.addComponent(CircleCollider, { r: radius })
+        }
 
         entity.addComponent(Position, position)
         entity.addComponent(RigidBody, { speed })
