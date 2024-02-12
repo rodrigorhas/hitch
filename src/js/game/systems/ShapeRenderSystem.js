@@ -3,7 +3,7 @@ import { Shape } from "../components/Shapes/Shape.js";
 import { Position } from "../components/Position.js";
 import { Collider } from "../../engine/support/Collider/Collider.js";
 
-export class RenderSystem extends System {
+export class ShapeRenderSystem extends System {
     queries = {
         renderables: {
             components: [ Shape, Collider, Position ]

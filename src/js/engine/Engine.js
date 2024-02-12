@@ -50,10 +50,10 @@ export class Engine {
         this.time.update(() => {
             this.ecs.update(this)
 
-            this.#render.call(this, canvas.ctx)
             this.#update.call(this)
-
             this.input.update(this)
+
+            this.#render.call(this, canvas.ctx)
         })
     }
 

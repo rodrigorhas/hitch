@@ -6,9 +6,10 @@ import { RigidBody } from "../../components/RigidBody.js";
 import { Collidable } from "../../components/Tags/Collidable.js";
 import { Tooltip } from "../../components/Tooltip.js";
 import { Vector2 } from "../../../engine/support/Vectors/Vector2.js";
-import { Material } from "../../components/Material.js";
-import { CircleShape } from "../../components/Shapes/CircleShape.js";
-import { CircleCollider } from "../../../engine/support/Collider/CircleCollider.js";
+import { Sprite } from "../../components/Sprite.js";
+import { BoxShape } from "../../components/Shapes/BoxShape.js";
+import { BoxCollider } from "../../../engine/support/Collider/BoxCollider.js";
+import { toGridCell } from "../../utils/Utils.js";
 
 export class Player extends Entity {
     constructor(options) {
@@ -21,24 +22,36 @@ export class Player extends Entity {
         }
     }
 
+    get tooltipText () {
+        const position = this.getComponent(Position)
+
+        return `${this.name} (${toGridCell(position.x)}, ${toGridCell(position.y)})`
+    }
+
     static make(options) {
         const entity = new this(options)
 
-        const { width, height, color, speed, position, radius } = options;
+        const { dimension, tooltip, speed, position } = options;
 
-        entity.addComponent(Material, { color })
-        // entity.addComponent(BoxShape, { width, height })
-        // entity.addComponent(BoxCollider, { w: width, h: height })
+        entity.addComponent(Sprite, {
+            image: {
+                src: 'js/game/assets/char_a_p1/char_a_p1_0bas_humn_v01.png',
+                cropSize: 16,
+            },
+            dimension,
+            position,
+        })
 
-        entity.addComponent(CircleShape, { radius })
-        entity.addComponent(CircleCollider, { r: radius })
+        entity.addComponent(BoxShape, dimension)
+        entity.addComponent(BoxCollider, dimension)
 
         entity.addComponent(Position, position)
         entity.addComponent(RigidBody, { speed })
         entity.addComponent(Tooltip, {
-            color, width, height,
+            width: dimension.width + 16, height: 16,
+            color: tooltip.color,
             offset: new Vector2().set(-10, -15),
-            text: entity.name
+            text: entity.tooltipText
         })
 
         // tags
@@ -52,8 +65,14 @@ export class Player extends Entity {
 export const randomPlayers = (game, min, max) => Array(fastRandomNumber(min, max)).fill(0).map(function () {
     return Player.make({
         name: randomHash(),
-        color: randomHex(),
         speed: randomNumber(0.1, 1),
+        tooltip: {
+            color: randomHex(),
+        },
+        dimension: {
+            width: 32,
+            height: 32
+        },
         position: {
             x: fastRandomNumber(0, game.canvas.width - 20),
             y: fastRandomNumber(0, game.canvas.height - 20)

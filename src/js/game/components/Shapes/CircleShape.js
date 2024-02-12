@@ -19,7 +19,11 @@ export class CircleShape extends Shape {
         circle.arc(bounds.x, bounds.y, this.radius, 0, 2 * Math.PI);
 
         ctx.save()
-        ctx.fillStyle = material.color;
+
+        if (material) {
+            ctx.fillStyle = material.color;
+        }
+
         ctx.fill(circle)
         ctx.restore()
     }

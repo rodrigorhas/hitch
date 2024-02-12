@@ -6,10 +6,10 @@ export class Collider2D {
      */
     static BoxColliding(box1, box2) {
         return !(
-            box1.bounds.x > box2.bounds.x + box2.bounds.w
-            || box1.bounds.x + box1.bounds.w < box2.bounds.x
-            || box1.bounds.y > box2.bounds.y + box2.bounds.h
-            || box1.bounds.y + box1.bounds.h < box2.bounds.y
+            box1.bounds.x > box2.bounds.x + box2.bounds.width
+            || box1.bounds.x + box1.bounds.width < box2.bounds.x
+            || box1.bounds.y > box2.bounds.y + box2.bounds.height
+            || box1.bounds.y + box1.bounds.height < box2.bounds.y
         );
     }
 
@@ -33,7 +33,7 @@ export class Collider2D {
         return Math.sqrt(
             (circle.bounds.x - point.x) * (circle.bounds.x - point.x) +
             (circle.bounds.y - point.y) * (circle.bounds.y - point.y)
-        ) < circle.bounds.r
+        ) < circle.bounds.radius
     }
 
     /**
@@ -43,8 +43,8 @@ export class Collider2D {
      */
     static BoxBoxColliding(box1, box2) {
         return (
-            box1.bounds.x <= box2.bounds.x + box2.bounds.w && box1.bounds.x + box1.bounds.w >= box2.bounds.x &&
-            box1.bounds.y <= box2.bounds.y + box2.bounds.h && box1.bounds.y + box1.bounds.h > box2.bounds.y
+            box1.bounds.x <= box2.bounds.x + box2.bounds.width && box1.bounds.x + box1.bounds.width >= box2.bounds.x &&
+            box1.bounds.y <= box2.bounds.y + box2.bounds.height && box1.bounds.y + box1.bounds.height > box2.bounds.y
         )
     }
 
@@ -58,7 +58,7 @@ export class Collider2D {
             Math.sqrt(
                 (circle1.bounds.x - circle2.bounds.x) * (circle1.bounds.x - circle2.bounds.x) +
                 (circle1.bounds.y - circle2.bounds.y) * (circle1.bounds.y - circle2.bounds.y)
-            ) < circle1.bounds.r + circle2.bounds.r
+            ) < circle1.bounds.radius + circle2.bounds.radius
         )
     }
 
@@ -69,31 +69,31 @@ export class Collider2D {
      */
     static BoxCircleColliding(box, circle) {
         // Get the distance between the two objects
-        const distX = Math.abs(circle.bounds.x - box.bounds.x - box.bounds.w / 2);
-        const distY = Math.abs(circle.bounds.y - box.bounds.y - box.bounds.h / 2);
+        const distX = Math.abs(circle.bounds.x - box.bounds.x - box.bounds.width / 2);
+        const distY = Math.abs(circle.bounds.y - box.bounds.y - box.bounds.height / 2);
 
         // Check to make sure it is definitely not overlapping
-        if (distX > (box.bounds.w / 2 + circle.bounds.r)) {
+        if (distX > (box.bounds.width / 2 + circle.bounds.radius)) {
             return false;
         }
 
-        if (distY > (box.bounds.h / 2 + circle.bounds.r)) {
+        if (distY > (box.bounds.height / 2 + circle.bounds.radius)) {
             return false;
         }
 
         // Check to see if it is definitely overlapping
-        if (distX <= (box.bounds.w / 2)) {
+        if (distX <= (box.bounds.width / 2)) {
             return true;
         }
 
-        if (distY <= (box.bounds.h / 2)) {
+        if (distY <= (box.bounds.height / 2)) {
             return true;
         }
 
         // Last Resort to see if they are overlapping
-        const dx = distX - box.bounds.w / 2;
-        const dy = distY - box.bounds.h / 2;
+        const dx = distX - box.bounds.width / 2;
+        const dy = distY - box.bounds.height / 2;
 
-        return (dx * dx + dy * dy <= (circle.bounds.r * circle.bounds.r));
+        return (dx * dx + dy * dy <= (circle.bounds.radius * circle.bounds.radius));
     }
 }

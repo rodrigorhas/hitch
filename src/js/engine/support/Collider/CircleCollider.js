@@ -1,22 +1,22 @@
 import { Collider } from "./Collider.js";
 
 export class CircleCollider extends Collider {
-    constructor({ x = 0, y = 0, r = 0 }) {
+    constructor({ x = 0, y = 0, radius = 0 }) {
         super();
 
-        this.bounds = { x, y, r }
+        this.bounds = { x, y, radius }
     }
 
     updateBounds({ position }) {
-        this.bounds.x = position.x - (this.bounds.r * 0.5);
-        this.bounds.y = position.y - (this.bounds.r * 0.5);
+        this.bounds.x = position.x - (this.bounds.radius * 0.5);
+        this.bounds.y = position.y - (this.bounds.radius * 0.5);
     }
 
     render(ctx) {
-        const { x, y, r } = this.bounds;
+        const { x, y, radius } = this.bounds;
 
         const circle = new Path2D();
-        circle.arc(x, y, r, 0, 2 * Math.PI)
+        circle.arc(x, y, radius, 0, 2 * Math.PI)
 
         ctx.save()
         ctx.strokeStyle = 'black'

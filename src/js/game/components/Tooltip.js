@@ -21,6 +21,10 @@ export class Tooltip extends RenderableComponent {
         this.visible = false;
     }
 
+    setText (text) {
+        this.text = text
+    }
+
     render(ctx, entity) {
         const position = entity.getComponent(Position)
         const offset = position.clone().add(this.offset)

@@ -1,19 +1,26 @@
-import { Player } from './entities/player/Player.js'
+import { Player, randomPlayers } from './entities/player/Player.js'
 import { Engine } from "../engine/Engine.js";
-import { RenderSystem } from "./systems/RenderSystem.js";
+import { SpriteRenderSystem } from "./systems/SpriteRenderSystem.js";
 import { PlayerControllerSystem } from "./systems/PlayerControllerSystem.js";
 import { TooltipSystem } from "./systems/TooltipSystem.js";
 import { CollisionSystem } from "./systems/CollisionSystem.js";
+import { withGrid } from "./utils/Utils.js";
 
 const entities = [
     Player.make({
-        name: 'luis',
-        color: 'cornflowerblue',
+        isControlled: true,
+        name: 'Player',
         speed: 0.15,
-        radius: 10,
+        tooltip: {
+            color: 'black',
+        },
+        dimension: {
+            width: 32,
+            height: 32,
+        },
         position: {
-            x: 0,
-            y: 0
+            x: withGrid(2),
+            y: withGrid(2)
         }
     }),
 ];
@@ -29,7 +36,7 @@ game.ecs.entities
 
 game.ecs.systems
     .register(CollisionSystem)
-    .register(RenderSystem)
+    .register(SpriteRenderSystem)
     .register(TooltipSystem)
     .register(PlayerControllerSystem)
 

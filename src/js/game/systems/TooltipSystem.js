@@ -27,6 +27,7 @@ export class TooltipSystem extends System {
             }
 
             if (tooltip.visible || Collider2D.PointBoxColliding(mouse.position, collider)) {
+                tooltip.setText(entity.tooltipText)
                 tooltip.render(ctx, entity)
             }
         }
