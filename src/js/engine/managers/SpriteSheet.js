@@ -51,9 +51,7 @@ export class SpriteSheet {
     }
 
     getFrameAt(x, y) {
-        const col = Math.floor(x / this.frameWidth);
-        const row = Math.floor(y / this.frameHeight);
-        const frameNumber = row * this.cols + col;
+        const frameNumber = y * this.cols + x;
 
         if (frameNumber >= 0 && frameNumber < this.totalFrames) {
             return this.getFrame(frameNumber);

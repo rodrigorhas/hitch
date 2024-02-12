@@ -40,6 +40,16 @@ export class Player extends Entity {
             },
             dimension,
             position,
+            animations: {
+                'idle-up': [ [0, 1] ],
+                'idle-down': [ [0, 0] ],
+                'idle-left': [ [0, 3] ],
+                'idle-right': [ [0, 2] ],
+                'walk-up': [ [0, 5], [1, 5], [2, 5], [3, 5], [4, 5], [5, 5] ],
+                'walk-down': [ [0, 4], [1, 4], [2, 4], [3, 4], [4, 4], [5, 4] ],
+                'walk-left': [ [0, 7], [1, 7], [2, 7], [3, 7], [4, 7], [5, 7] ],
+                'walk-right': [ [0, 6], [1, 6], [2, 6], [3, 6], [4, 6], [5, 6] ],
+            }
         })
 
         entity.addComponent(BoxShape, dimension)

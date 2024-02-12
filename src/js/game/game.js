@@ -10,7 +10,7 @@ const entities = [
     Player.make({
         isControlled: true,
         name: 'Player',
-        speed: 0.15,
+        speed: 0.10,
         tooltip: {
             color: 'black',
         },

@@ -3,8 +3,9 @@ import { SpriteSheet } from "../../engine/managers/SpriteSheet.js";
 
 export class Sprite extends Component {
     isLoaded = false;
+    direction = 'down';
 
-    constructor({ image, position, dimension }) {
+    constructor({ image, position, dimension, animations }) {
         super();
 
         this.imageElement = new Image();
@@ -22,28 +23,40 @@ export class Sprite extends Component {
         this.position = position;
         this.dimension = dimension;
 
-        this.currentAnimation = 'idle-down';
+        this.currentAnimation = 'walk-left';
         this.currentAnimationFrame = 0;
 
         this.animationFrameLimit = 16;
         this.animationFrameProgress = this.animationFrameLimit;
 
-        this.animations = {
-            'idle-down': [
-                [0, 0]
-            ],
-            'walk-left': [
-                [0, 7], [1, 7], [2, 7], [3, 7], [4, 7], [5, 7],
-            ]
-        }
+        this.animations = animations;
     }
 
     onImageLoad () {
         this.isLoaded = true;
     }
 
+    setAnimation (animationName) {
+        this.currentAnimation = animationName;
+        this.currentAnimationFrame = 0;
+    }
+
     get frame () {
         return this.animations[this.currentAnimation][this.currentAnimationFrame]
+    }
+
+    updateAnimationProgress () {
+        if (this.animationFrameProgress > 0) {
+            this.animationFrameProgress -= 1;
+            return;
+        }
+
+        this.animationFrameProgress = this.animationFrameLimit;
+        this.currentAnimationFrame += 1;
+
+        if (this.frame === undefined) {
+            this.currentAnimationFrame = 0;
+        }
     }
 
     render(ctx, entity) {
@@ -54,7 +67,9 @@ export class Sprite extends Component {
         const [frameX, frameY] = this.frame;
         const sheetFrame = this.spritesheet.getFrameAt(frameX, frameY);
 
-        ctx.drawImage(...sheetFrame(this.position))
+        ctx.drawImage(...sheetFrame(this.position));
+
+        this.updateAnimationProgress();
     }
 
     update ({ position }) {
