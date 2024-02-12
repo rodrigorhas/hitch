@@ -40,6 +40,7 @@ export class Player extends Entity {
             },
             dimension,
             position,
+            animationFrameLimit: 12,
             animations: {
                 'idle-up': [ [0, 1] ],
                 'idle-down': [ [0, 0] ],

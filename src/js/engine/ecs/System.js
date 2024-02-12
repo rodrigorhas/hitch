@@ -13,6 +13,7 @@ export class System {
      * @param {SystemQueries<any>} queries
      */
     queries = {}
+    useFixedUpdate = false;
 
     /**
      * @function

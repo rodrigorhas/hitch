@@ -8,4 +8,8 @@ export class Position extends Classes(Vector2, Component) {
 
         this.set(x, y)
     }
+
+    move (direction, speed) {
+        this.add(direction.normalize().multiply(speed))
+    }
 }

@@ -2,12 +2,17 @@ import { IterableWeakMap } from "../support/IterableWeakMap.js";
 
 class ECSSystemManager {
     #systems = new IterableWeakMap();
+    #systemsByPriority = [];
 
     register(system, { priority } = {}) {
         const instance = new system();
         instance.priority = priority !== undefined ? priority : this.#systems.size;
 
         this.#systems.set(system, instance)
+        this.#systemsByPriority = Array
+            .from(this.#systems.values())
+            .sort((systemA, systemB) => systemA.priority - systemB.priority)
+
         return this;
     }
 
@@ -20,12 +25,27 @@ class ECSSystemManager {
      * @param {ECSEntityManager} entities
      */
     update(game, entities) {
-        const systems = Array.from(this.#systems.values());
-        systems.sort((systemA, systemB) => systemA.priority - systemB.priority)
+        const systems = this.#systemsByPriority;
 
         for (const system of systems) {
             system.prepareExecution(entities)
             system.execute(game)
+        }
+    }
+
+    /**
+     * @param {Engine} game
+     * @param {ECSEntityManager} entities
+     */
+    fixedUpdate(game, entities) {
+        const systems = this.#systemsByPriority;
+
+        for (const system of systems) {
+            if (system.useFixedUpdate) {
+                console.log(system.name)
+                system.prepareExecution(entities)
+                system.execute(game)
+            }
         }
     }
 }
@@ -80,5 +100,9 @@ export class ECS {
 
     update(game) {
         this.systems.update(game, this.entities)
+    }
+
+    fixedUpdate(game) {
+        this.systems.fixedUpdate(game, this.entities)
     }
 }

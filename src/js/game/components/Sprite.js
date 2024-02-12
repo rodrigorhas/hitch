@@ -5,7 +5,7 @@ export class Sprite extends Component {
     isLoaded = false;
     direction = 'down';
 
-    constructor({ image, position, dimension, animations }) {
+    constructor({ image, position, dimension, animations, ...options }) {
         super();
 
         this.imageElement = new Image();
@@ -26,7 +26,7 @@ export class Sprite extends Component {
         this.currentAnimation = 'walk-left';
         this.currentAnimationFrame = 0;
 
-        this.animationFrameLimit = 16;
+        this.animationFrameLimit = options.animationFrameLimit || 16;
         this.animationFrameProgress = this.animationFrameLimit;
 
         this.animations = animations;

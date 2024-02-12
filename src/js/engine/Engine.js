@@ -1,19 +1,17 @@
 import { Input } from './managers/Input.js'
 import { Time } from "./managers/Time.js";
 import { ECS } from "./ecs/ECS.js";
+import { noop } from "../game/utils/Utils.js";
 
 /**
  * @typedef {HTMLCanvasElement & {ctx: CanvasRenderingContext2D}} EngineCanvas
  */
 
-const noop = () => {
-};
-
 export class Engine {
     #render;
     #update;
+    #fixedUpdate;
     #mountElement;
-
 
     /**
      * @type {EngineCanvas} canvas
@@ -29,6 +27,7 @@ export class Engine {
     constructor(options) {
         this.#render = options.render || noop;
         this.#update = options.update || noop;
+        this.#fixedUpdate = options.fixedUpdate || noop;
 
         this.#mountElement = options.element;
 
@@ -46,6 +45,11 @@ export class Engine {
 
     gameLoop(canvas) {
         canvas.clearCanvas()
+
+        this.time.fixedUpdate(() => {
+            this.ecs.fixedUpdate(this)
+            this.#fixedUpdate.call(this)
+        })
 
         this.time.update(() => {
             this.ecs.update(this)

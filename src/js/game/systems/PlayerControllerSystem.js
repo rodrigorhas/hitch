@@ -4,6 +4,7 @@ import { Controllable } from "../components/Tags/Controllable.js";
 import { RigidBody } from "../components/RigidBody.js";
 import { randomPlayers } from "../entities/player/Player.js";
 import { Sprite } from "../components/Sprite.js";
+import { Vector2 } from "../../engine/support/Vectors/Vector2.js";
 
 export class PlayerControllerSystem extends System {
     queries = {
@@ -13,25 +14,34 @@ export class PlayerControllerSystem extends System {
     }
 
     direction (input) {
-        let direction;
+        const direction = new Vector2(0, 0);
+
+        let animationDirection;
 
         if (input.keyboard.isPressed('a')) {
-            direction = 'left';
+            direction.set(-1, 0);
+            animationDirection = 'left';
         }
 
         if (input.keyboard.isPressed('d')) {
-            direction = 'right';
+            direction.set(1, 0);
+            animationDirection = 'right';
         }
 
         if (input.keyboard.isPressed('w')) {
-            direction = 'up';
+            direction.set(0, -1);
+            animationDirection = 'up';
         }
 
         if (input.keyboard.isPressed('s')) {
-            direction = 'down';
+            direction.set(0, 1);
+            animationDirection = 'down';
         }
 
-        return direction;
+        return {
+            direction,
+            animationDirection
+        };
     }
 
     execute(game) {
@@ -43,38 +53,23 @@ export class PlayerControllerSystem extends System {
 
             const rb = entity.getComponent(RigidBody)
 
-            if (input.keyboard.isPressed('a')) {
-                position.x += (rb.speed * -1) * time.deltaTime;
-            }
+            const {animationDirection, direction} = this.direction(input);
 
-            if (input.keyboard.isPressed('d')) {
-                position.x += rb.speed * time.deltaTime;
-            }
-
-            if (input.keyboard.isPressed('w')) {
-                position.y += (rb.speed * -1) * time.deltaTime
-            }
-
-            if (input.keyboard.isPressed('s')) {
-                position.y += rb.speed * time.deltaTime;
-            }
+            position.move(direction, rb.speed * time.deltaTime)
 
             if (input.keyboard.isButtonDown('r')) {
                 position.set((canvas.width * 0.5), (canvas.height * 0.5))
             }
 
-            const direction = this.direction(input);
-
-            if (sprite.direction !== direction) {
+            if (sprite.direction !== animationDirection) {
                 sprite.setAnimation(
-                    direction
-                        ? `walk-${direction || 'down'}`
-                        : `idle-${sprite.direction || direction}`
+                    animationDirection
+                        ? `walk-${animationDirection || 'down'}`
+                        : `idle-${sprite.direction || animationDirection}`
                 )
 
-                sprite.direction = direction;
+                sprite.direction = animationDirection;
             }
-
 
             if (input.keyboard.isButtonDown(',')) {
                 game.ecs.entities.add(randomPlayers(game, 1, 3))
