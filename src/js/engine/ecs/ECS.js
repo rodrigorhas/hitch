@@ -43,7 +43,6 @@ class ECSSystemManager {
 
         for (const system of systems) {
             if (system.useFixedUpdate) {
-                console.log(system.name)
                 system.prepareExecution(entities)
                 system.execute(game)
             }

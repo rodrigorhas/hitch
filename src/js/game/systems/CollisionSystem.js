@@ -34,11 +34,6 @@ export class CollisionSystem extends System {
                 if (Collider2D.BoxColliding(colliderA, colliderB)) {
                     Physics.separateBoxColliders(entityA, entityB)
                 }
-
-                if (game.debug) {
-                    colliderA.render(canvas.ctx)
-                    colliderB.render(canvas.ctx)
-                }
             }
         }
     }

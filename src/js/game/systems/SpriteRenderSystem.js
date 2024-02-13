@@ -19,6 +19,12 @@ export class SpriteRenderSystem extends System {
 
             sprite.update({ position })
             sprite.render(ctx, entity)
+
+            if (game.debug) {
+                const collider = entity.getComponent(Collider)
+
+                collider.onDrawDebug(canvas.ctx)
+            }
         }
     }
 }

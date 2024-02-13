@@ -1,7 +1,12 @@
 import { Collider } from "./Collider.js";
+import { noop } from "../../../game/utils/Utils.js";
 
 export class BoxCollider extends Collider {
-    constructor({ x = 0, y = 0, width = 0, height = 0, offset }) {
+    constructor({
+        x = 0, y = 0,
+        width = 0, height = 0,
+        offset, onDrawDebug = noop
+    }) {
         super();
 
         this.offset = {
@@ -10,6 +15,10 @@ export class BoxCollider extends Collider {
         };
 
         this.bounds = { x, y, width, height };
+
+        if (onDrawDebug) {
+            this.onDrawDebug = onDrawDebug;
+        }
     }
 
     updateBounds({ position }) {
@@ -25,7 +34,7 @@ export class BoxCollider extends Collider {
         return this.bounds;
     }
 
-    render(ctx) {
+    onDrawDebug(ctx) {
         const { x, y, width, height } = this.bounds;
 
         ctx.save()

@@ -52,6 +52,9 @@ const game = new Engine({
 game.ecs.entities
     .add(entities)
 
+game.ecs.entities
+    .add(randomPlayers(game, 200, 240))
+
 game.ecs.systems
     .register(PlayerControllerSystem)
     .register(CollisionSystem)
@@ -73,7 +76,6 @@ function render(ctx) {
 }
 
 function update() {
-    console.log(game.input.keyboard.isButtonDown(','))
     if (game.input.keyboard.isButtonDown('.')) {
         game.debug = !game.debug;
     }

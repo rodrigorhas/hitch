@@ -58,7 +58,17 @@ export class Player extends Entity {
         entity.addComponent(BoxCollider, {
             width: Math.floor(dimension.width * 0.5),
             height: Math.floor(dimension.height * 0.5),
-            offset: { y: 8 }
+            offset: { y: 8 },
+            onDrawDebug (ctx) {
+                const { x, y, width, height } = this.bounds;
+
+                ctx.save()
+                ctx.strokeStyle = 'black'
+                ctx.lineWidth = 1
+                // ctx.setLineDash([ 2, 2 ]);
+                ctx.strokeRect(x, y, width, height)
+                ctx.restore()
+            }
         })
 
         entity.addComponent(Position, position)
@@ -87,7 +97,7 @@ export class Player extends Entity {
     }
 }
 
-export const randomPlayers = (game, min, max) => Array(fastRandomNumber(min, max)).fill(0).map(function () {
+export const randomPlayers = (game, min, max) => Array(400).fill(0).map(function () {
     return Player.make({
         name: randomHash(),
         walkSpeed: randomNumber(0.8, 0.9),
