@@ -40,7 +40,7 @@ export class Player extends Entity {
             },
             dimension,
             position,
-            animationFrameLimit: 12,
+            animationFrameLimit: 32,
             animations: {
                 'idle-up': [ [0, 1] ],
                 'idle-down': [ [0, 0] ],
@@ -66,7 +66,10 @@ export class Player extends Entity {
         })
 
         // tags
-        entity.addComponent(Controllable)
+        if (options.isControlled) {
+            entity.addComponent(Controllable)
+        }
+
         entity.addComponent(Collidable)
 
         return entity;

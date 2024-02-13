@@ -7,12 +7,12 @@ export class BoxCollider extends Collider {
         this.bounds = { x, y, width, height }
     }
 
-    updateBounds({ shape, position }) {
+    updateBounds({ position }) {
         this.bounds = {
-            x: position.x - (shape.width * 0.5),
-            y: position.y - (shape.height * 0.5),
-            width: shape.width,
-            height: shape.height
+            x: position.x - (this.bounds.width * 0.5),
+            y: position.y - (this.bounds.height * 0.5),
+            width: this.bounds.width,
+            height: this.bounds.height
         }
     }
 

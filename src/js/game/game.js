@@ -23,6 +23,22 @@ const entities = [
             y: withGrid(2)
         }
     }),
+    Player.make({
+        isControlled: false,
+        name: 'Player 2',
+        speed: 0.1,
+        tooltip: {
+            color: 'black',
+        },
+        dimension: {
+            width: 32,
+            height: 32,
+        },
+        position: {
+            x: withGrid(4),
+            y: withGrid(4)
+        }
+    }),
 ];
 
 const game = new Engine({
@@ -35,10 +51,10 @@ game.ecs.entities
     .add(entities)
 
 game.ecs.systems
+    .register(PlayerControllerSystem)
     .register(CollisionSystem)
     .register(SpriteRenderSystem)
     .register(TooltipSystem)
-    .register(PlayerControllerSystem)
 
 function render(ctx) {
     const text = 'Entities: ' + game.ecs.entities.count();
