@@ -1,10 +1,9 @@
 import { System } from "../../engine/ecs/System.js";
 import { Collidable } from "../components/Tags/Collidable.js";
 import { Position } from "../components/Position.js";
-import { BoxShape } from "../components/Shapes/BoxShape.js";
-import { Collider } from "../../engine/support/Collider/Collider.js";
 import { BoxCollider } from "../../engine/support/Collider/BoxCollider.js";
 import {Collider2D} from "../../engine/support/Collider/Collider2D.js";
+import Physics from "../utils/Physics.js";
 
 export class CollisionSystem extends System {
     queries = {
@@ -32,18 +31,8 @@ export class CollisionSystem extends System {
                 colliderA.updateBounds({ position: positionA })
                 colliderB.updateBounds({ position: positionB })
 
-                console.log(colliderA, colliderB)
-
                 if (Collider2D.BoxColliding(colliderA, colliderB)) {
-                    const previousPositionA = positionA.previousPosition;
-
-                    positionA.set(previousPositionA.x, previousPositionA.y)
-
-                    // const previousPositionB = positionB.previousPosition;
-                    //
-                    // positionB.set(previousPositionB.x, previousPositionB.y)
-
-                    // console.log('collide')
+                    Physics.separateBoxColliders(entityA, entityB)
                 }
 
                 if (game.debug) {

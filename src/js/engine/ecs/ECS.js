@@ -1,4 +1,5 @@
 import { IterableWeakMap } from "../support/IterableWeakMap.js";
+import { Position } from "../../game/components/Position.js";
 
 class ECSSystemManager {
     #systems = new IterableWeakMap();
@@ -89,6 +90,15 @@ class ECSEntityManager {
         entities = entities.flat(Infinity);
         this.#entities.push(...entities);
     }
+
+    sort () {
+        this.#entities = this.#entities.toSorted((a, b) => {
+            const posA = a.getComponent(Position);
+            const posB = b.getComponent(Position);
+
+            return posA.y - posB.y;
+        })
+    }
 }
 
 export class ECS {
@@ -99,10 +109,16 @@ export class ECS {
     }
 
     update(game) {
+        this.sortEntitiesByLayer();
+
         this.systems.update(game, this.entities)
     }
 
     fixedUpdate(game) {
         this.systems.fixedUpdate(game, this.entities)
+    }
+
+    sortEntitiesByLayer() {
+        this.entities.sort()
     }
 }

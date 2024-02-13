@@ -1,4 +1,4 @@
-import { Player, randomPlayers } from './entities/player/Player.js'
+import { Player } from './entities/player/Player.js'
 import { Engine } from "../engine/Engine.js";
 import { SpriteRenderSystem } from "./systems/SpriteRenderSystem.js";
 import { PlayerControllerSystem } from "./systems/PlayerControllerSystem.js";
@@ -10,7 +10,7 @@ const entities = [
     Player.make({
         isControlled: true,
         name: 'Player',
-        speed: 0.08,
+        speed: 0.8,
         tooltip: {
             color: 'black',
         },

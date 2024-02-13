@@ -7,7 +7,6 @@ import { Collidable } from "../../components/Tags/Collidable.js";
 import { Tooltip } from "../../components/Tooltip.js";
 import { Vector2 } from "../../../engine/support/Vectors/Vector2.js";
 import { Sprite } from "../../components/Sprite.js";
-import { BoxShape } from "../../components/Shapes/BoxShape.js";
 import { BoxCollider } from "../../../engine/support/Collider/BoxCollider.js";
 import { toGridCell } from "../../utils/Utils.js";
 
@@ -40,7 +39,7 @@ export class Player extends Entity {
             },
             dimension,
             position,
-            animationFrameLimit: 32,
+            animationFrameLimit: 16,
             animations: {
                 'idle-up': [ [0, 1] ],
                 'idle-down': [ [0, 0] ],
@@ -50,11 +49,18 @@ export class Player extends Entity {
                 'walk-down': [ [0, 4], [1, 4], [2, 4], [3, 4], [4, 4], [5, 4] ],
                 'walk-left': [ [0, 7], [1, 7], [2, 7], [3, 7], [4, 7], [5, 7] ],
                 'walk-right': [ [0, 6], [1, 6], [2, 6], [3, 6], [4, 6], [5, 6] ],
+                'run-up': [ [0, 5], [1, 5], [6, 5], [3, 5], [4, 5], [7, 5] ],
+                'run-down': [ [0, 4], [1, 4], [6, 4], [3, 4], [4, 4], [7, 4] ],
+                'run-left': [ [0, 7], [1, 7], [6, 7], [3, 7], [4, 7], [7, 7] ],
+                'run-right': [ [0, 6], [1, 6], [6, 6], [3, 6], [4, 6], [7, 6] ],
             }
         })
 
-        entity.addComponent(BoxShape, dimension)
-        entity.addComponent(BoxCollider, dimension)
+        entity.addComponent(BoxCollider, {
+            width: Math.floor(dimension.width * 0.5),
+            height: Math.floor(dimension.height * 0.5),
+            offset: { y: 8 }
+        })
 
         entity.addComponent(Position, position)
         entity.addComponent(RigidBody, { speed })

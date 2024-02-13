@@ -23,7 +23,7 @@ export class Sprite extends Component {
         this.position = position;
         this.dimension = dimension;
 
-        this.currentAnimation = 'walk-left';
+        this.currentAnimation = 'idle-down';
         this.currentAnimationFrame = 0;
 
         this.animationFrameLimit = options.animationFrameLimit || 16;

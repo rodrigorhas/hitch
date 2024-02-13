@@ -55,16 +55,18 @@ export class PlayerControllerSystem extends System {
 
             const {animationDirection, direction} = this.direction(input);
 
-            position.move(direction, rb.speed * time.deltaTime)
+            position.move(direction, rb.speed)
 
             if (input.keyboard.isButtonDown('r')) {
                 position.set((canvas.width * 0.5), (canvas.height * 0.5))
             }
 
             if (sprite.direction !== animationDirection) {
+                const state = 'walk';
+
                 sprite.setAnimation(
                     animationDirection
-                        ? `walk-${animationDirection || 'down'}`
+                        ? `${state}-${animationDirection || 'down'}`
                         : `idle-${sprite.direction || animationDirection}`
                 )
 
