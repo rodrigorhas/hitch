@@ -1,16 +1,18 @@
-import { Player } from './entities/player/Player.js'
+import { Player, randomPlayers } from './entities/player/Player.js'
 import { Engine } from "../engine/Engine.js";
 import { SpriteRenderSystem } from "./systems/SpriteRenderSystem.js";
 import { PlayerControllerSystem } from "./systems/PlayerControllerSystem.js";
 import { TooltipSystem } from "./systems/TooltipSystem.js";
 import { CollisionSystem } from "./systems/CollisionSystem.js";
 import { withGrid } from "./utils/Utils.js";
+import { randomNumber } from "../engine/support/Random.js";
 
 const entities = [
     Player.make({
         isControlled: true,
         name: 'Player',
-        speed: 0.8,
+        walkSpeed: randomNumber(0.8, 0.9),
+        runningSpeed: randomNumber(1.2, 1.5),
         tooltip: {
             color: 'black',
         },
@@ -71,8 +73,13 @@ function render(ctx) {
 }
 
 function update() {
+    console.log(game.input.keyboard.isButtonDown(','))
     if (game.input.keyboard.isButtonDown('.')) {
         game.debug = !game.debug;
+    }
+
+    if (game.input.keyboard.isButtonDown(',')) {
+        game.ecs.entities.add(randomPlayers(game, 1, 3))
     }
 }
 

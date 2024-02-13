@@ -47,7 +47,10 @@ export class PlayerControllerSystem extends System {
     execute(game) {
         const { canvas, input, time } = game;
 
-        for (const entity of this.queries.players.results) {
+        /** @type {Player[]|*} */
+        const entities = this.queries.players.results;
+
+        for (const entity of entities) {
             const position = entity.getComponent(Position)
             const sprite = entity.getComponent(Sprite)
 
@@ -61,8 +64,12 @@ export class PlayerControllerSystem extends System {
                 position.set((canvas.width * 0.5), (canvas.height * 0.5))
             }
 
+            if (input.keyboard.isPressed('q')) {
+                rb.setRunning(!rb.isRunning)
+            }
+
             if (sprite.direction !== animationDirection) {
-                const state = 'walk';
+                const state = rb.isRunning ? 'run' : 'walk';
 
                 sprite.setAnimation(
                     animationDirection

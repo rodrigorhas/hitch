@@ -16,7 +16,6 @@ export class Player extends Entity {
 
         this.state = {
             ...this.state,
-            color: options.color,
             speed: options.speed || 1,
         }
     }
@@ -30,7 +29,7 @@ export class Player extends Entity {
     static make(options) {
         const entity = new this(options)
 
-        const { dimension, tooltip, speed, position } = options;
+        const { dimension, tooltip, position } = options;
 
         entity.addComponent(Sprite, {
             image: {
@@ -63,7 +62,13 @@ export class Player extends Entity {
         })
 
         entity.addComponent(Position, position)
-        entity.addComponent(RigidBody, { speed })
+
+        entity.addComponent(RigidBody, {
+            isRunning: false,
+            walkSpeed: options.walkSpeed || 1,
+            runningSpeed: options.runningSpeed || 2,
+        })
+
         entity.addComponent(Tooltip, {
             width: dimension.width + 16, height: 16,
             color: tooltip.color,
@@ -85,7 +90,8 @@ export class Player extends Entity {
 export const randomPlayers = (game, min, max) => Array(fastRandomNumber(min, max)).fill(0).map(function () {
     return Player.make({
         name: randomHash(),
-        speed: randomNumber(0.1, 1),
+        walkSpeed: randomNumber(0.8, 0.9),
+        runningSpeed: randomNumber(1.2, 1.5),
         tooltip: {
             color: randomHex(),
         },
