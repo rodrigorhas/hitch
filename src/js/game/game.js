@@ -52,8 +52,8 @@ const game = new Engine({
 game.ecs.entities
     .add(entities)
 
-game.ecs.entities
-    .add(randomPlayers(game, 200, 240))
+// game.ecs.entities
+//     .add(randomPlayers(game, 200, 240))
 
 game.ecs.systems
     .register(PlayerControllerSystem)

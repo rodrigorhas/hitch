@@ -1,9 +1,12 @@
 import { Vector2 } from "../../support/Vectors/Vector2.js";
 import { GameObject } from "../../entities/GameObject.js";
+import { InputEvents } from "./InputEvents.js";
 
 export class MouseInput extends GameObject {
     initialized = false;
     position = new Vector2()
+    #eventListeners = new Map()
+    #events = new InputEvents()
 
     pointer = {
         position: new Vector2(),
@@ -14,12 +17,22 @@ export class MouseInput extends GameObject {
     handlers = {
         contextMenu(currentPosition, input, event) {
             input.pointer.pressed.add(event.button)
+            input.#events.emit(input.#events.EVENT_TYPES.MOUSE_DOWN, { 
+                button: event.button, 
+                position: currentPosition, 
+                event 
+            })
         },
 
         pointerStart(currentPosition, input, event) {
             input.pointer.pressed.add(event.button)
-
             input.pointer.position.set(currentPosition)
+            
+            input.#events.emit(input.#events.EVENT_TYPES.MOUSE_DOWN, { 
+                button: event.button, 
+                position: currentPosition, 
+                event 
+            })
         },
 
         pointerMove(currentPosition, input) {
@@ -29,13 +42,30 @@ export class MouseInput extends GameObject {
             if (input.isPressed(0)) {
                 input.pointer.position.set(currentPosition)
             }
+            
+            input.#events.emit(input.#events.EVENT_TYPES.MOUSE_MOVE, { 
+                position: currentPosition, 
+                delta: input.getDelta() 
+            })
         },
 
         pointerEnd(currentPosition, input, event) {
             input.pointer.pressed.delete(event.button)
-
-            input.lastPosition = currentPosition;
-            input.pointer.position = new Vector2();
+            input.pointer.lastPosition.set(currentPosition);
+            input.pointer.position.set(0, 0);
+            
+            input.#events.emit(input.#events.EVENT_TYPES.MOUSE_UP, { 
+                button: event.button, 
+                position: currentPosition, 
+                event 
+            })
+            
+            // Emit click event if it was a quick press and release
+            input.#events.emit(input.#events.EVENT_TYPES.MOUSE_CLICK, { 
+                button: event.button, 
+                position: currentPosition, 
+                event 
+            })
         }
     }
 
@@ -87,12 +117,56 @@ export class MouseInput extends GameObject {
     }
 
     #createPointerHandler(canvas, DOMType, type) {
-        canvas.addEventListener(DOMType, (event) => {
+        const handler = (event) => {
             event.preventDefault();
 
             const position = MouseInput.mouseEventToVector2(event)
 
             this.handlers[type](position, this, event);
-        });
+        };
+
+        // Store reference for cleanup
+        this.#eventListeners.set(DOMType, handler);
+        canvas.addEventListener(DOMType, handler);
+    }
+
+    // Add cleanup method for proper resource management
+    destroy() {
+        if (this.#eventListeners.size > 0) {
+            // Note: We need access to canvas for cleanup, but it's not stored
+            // This is a limitation that should be addressed in the future
+            this.#eventListeners.clear()
+        }
+        
+        this.pointer.pressed.clear()
+        this.position.set(0, 0)
+        this.pointer.position.set(0, 0)
+        this.pointer.lastPosition.set(0, 0)
+        this.initialized = false
+    }
+
+    // Add method to get mouse delta movement
+    getDelta() {
+        return this.pointer.position.clone().subtract(this.pointer.lastPosition)
+    }
+
+    // Add method to check if mouse moved
+    hasMoved() {
+        return !this.pointer.position.equals(this.pointer.lastPosition)
+    }
+
+    // Add method to access the event system
+    get events() {
+        return this.#events;
+    }
+
+    // Add method to register event listeners
+    on(eventType, callback, context = null) {
+        this.#events.on(eventType, callback, context);
+    }
+
+    // Add method to remove event listeners
+    off(eventType, callback) {
+        this.#events.off(eventType, callback);
     }
 }

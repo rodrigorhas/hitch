@@ -5,6 +5,7 @@ import { RigidBody } from "../components/RigidBody.js";
 import { randomPlayers } from "../entities/player/Player.js";
 import { Sprite } from "../components/Sprite.js";
 import { Vector2 } from "../../engine/support/Vectors/Vector2.js";
+import { InputConfig } from "../../engine/managers/Input/InputConfig.js";
 
 export class PlayerControllerSystem extends System {
     queries = {
@@ -13,27 +14,26 @@ export class PlayerControllerSystem extends System {
         }
     }
 
-    direction (input) {
+    direction(input) {
         const direction = new Vector2(0, 0);
-
         let animationDirection;
 
-        if (input.keyboard.isPressed('a')) {
+        if (input.keyboard.isPressedForAction(InputConfig.getKeysForAction('MOVE_LEFT'))) {
             direction.set(-1, 0);
             animationDirection = 'left';
         }
 
-        if (input.keyboard.isPressed('d')) {
+        if (input.keyboard.isPressedForAction(InputConfig.getKeysForAction('MOVE_RIGHT'))) {
             direction.set(1, 0);
             animationDirection = 'right';
         }
 
-        if (input.keyboard.isPressed('w')) {
+        if (input.keyboard.isPressedForAction(InputConfig.getKeysForAction('MOVE_UP'))) {
             direction.set(0, -1);
             animationDirection = 'up';
         }
 
-        if (input.keyboard.isPressed('s')) {
+        if (input.keyboard.isPressedForAction(InputConfig.getKeysForAction('MOVE_DOWN'))) {
             direction.set(0, 1);
             animationDirection = 'down';
         }
@@ -53,19 +53,17 @@ export class PlayerControllerSystem extends System {
         for (const entity of entities) {
             const position = entity.getComponent(Position)
             const sprite = entity.getComponent(Sprite)
-
             const rb = entity.getComponent(RigidBody)
+            const controllable = entity.getComponent(Controllable)
+
+            if (!controllable) continue;
 
             const {animationDirection, direction} = this.direction(input);
 
             position.move(direction, rb.speed)
 
-            if (input.keyboard.isButtonDown('r')) {
+            if (input.keyboard.isPressedForAction(InputConfig.getKeysForAction('RESET'))) {
                 position.set((canvas.width * 0.5), (canvas.height * 0.5))
-            }
-
-            if (input.keyboard.isPressed('q')) {
-                rb.setRunning(!rb.isRunning)
             }
 
             if (sprite.direction !== animationDirection) {
@@ -80,7 +78,7 @@ export class PlayerControllerSystem extends System {
                 sprite.direction = animationDirection;
             }
 
-            if (input.keyboard.isButtonDown(',')) {
+            if (input.keyboard.isPressedForAction(InputConfig.getKeysForAction('SPAWN_ENTITIES'))) {
                 game.ecs.entities.add(randomPlayers(game, 1, 3))
             }
         }
