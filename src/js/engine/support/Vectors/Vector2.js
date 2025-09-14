@@ -146,8 +146,13 @@ export class Vector2 {
     }
 
     set(x, y) {
-        this.x = x;
-        this.y = y;
+        if (x instanceof Vector2) {
+            this.x = x.x;
+            this.y = x.y;
+        } else {
+            this.x = x;
+            this.y = y;
+        }
 
         return this;
     }

@@ -7,6 +7,7 @@ export class MouseInput extends GameObject {
     position = new Vector2()
     #eventListeners = new Map()
     #events = new InputEvents()
+    #deltaVector = new Vector2()
 
     pointer = {
         position: new Vector2(),
@@ -36,17 +37,18 @@ export class MouseInput extends GameObject {
         },
 
         pointerMove(currentPosition, input) {
-            input.position = currentPosition;
+            if (!input.position.equals(currentPosition)) {
+                input.position.set(currentPosition);
 
-            // update position only if pointer is down
-            if (input.isPressed(0)) {
-                input.pointer.position.set(currentPosition)
+                if (input.isPressed(0)) {
+                    input.pointer.position.set(currentPosition)
+                }
+                
+                input.#events.emit(input.#events.EVENT_TYPES.MOUSE_MOVE, { 
+                    position: currentPosition, 
+                    delta: input.getDelta() 
+                })
             }
-            
-            input.#events.emit(input.#events.EVENT_TYPES.MOUSE_MOVE, { 
-                position: currentPosition, 
-                delta: input.getDelta() 
-            })
         },
 
         pointerEnd(currentPosition, input, event) {
@@ -145,9 +147,11 @@ export class MouseInput extends GameObject {
         this.initialized = false
     }
 
-    // Add method to get mouse delta movement
     getDelta() {
-        return this.pointer.position.clone().subtract(this.pointer.lastPosition)
+        return this.#deltaVector.set(
+            this.pointer.position.x - this.pointer.lastPosition.x,
+            this.pointer.position.y - this.pointer.lastPosition.y
+        )
     }
 
     // Add method to check if mouse moved

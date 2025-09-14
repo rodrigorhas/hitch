@@ -23,6 +23,7 @@ canvas {
     display: block;
     margin: 0 auto;
     background: #f2f2f2;
+    cursor: none;
 }
 
 image, canvas {
