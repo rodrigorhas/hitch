@@ -3,6 +3,7 @@ import { Collidable } from "../components/Tags/Collidable.js";
 import { Position } from "../components/Position.js";
 import { BoxCollider } from "../../engine/support/Collider/BoxCollider.js";
 import {Collider2D} from "../../engine/support/Collider/Collider2D.js";
+import { Quadtree } from "../../engine/support/Quadtree.js";
 import Physics from "../utils/Physics.js";
 
 export class CollisionSystem extends System {
@@ -12,27 +13,78 @@ export class CollisionSystem extends System {
         }
     }
 
+    constructor() {
+        super();
+        this.quadtree = null;
+        this.lastCanvasSize = { width: 0, height: 0 };
+    }
+
     execute(game) {
         const { canvas } = game;
 
+        // Cria ou atualiza quadtree se o canvas mudou de tamanho
+        if (!this.quadtree || 
+            canvas.width !== this.lastCanvasSize.width || 
+            canvas.height !== this.lastCanvasSize.height) {
+            
+            this.quadtree = new Quadtree({
+                x: 0,
+                y: 0,
+                width: canvas.width,
+                height: canvas.height
+            }, 10, 5);
+            
+            this.lastCanvasSize = { width: canvas.width, height: canvas.height };
+        }
+
+        // Limpa o quadtree
+        this.quadtree.clear();
+
         const entities = this.queries.entities.results;
 
-        for (let i = 0; i < entities.length; i++) {
-            for (let j = i + 1; j < entities.length; j++) {
-                const entityA = entities[i];
-                const entityB = entities[j];
+        // Insere todas as entidades no quadtree
+        for (const entity of entities) {
+            const collider = entity.getComponent(BoxCollider);
+            const position = entity.getComponent(Position);
 
-                const colliderA = entityA.getComponent(BoxCollider);
-                const positionA = entityA.getComponent(Position);
+            if (collider) {
+                collider.updateBounds({ position });
+                
+                this.quadtree.insert({
+                    entity: entity,
+                    x: collider.bounds.x,
+                    y: collider.bounds.y,
+                    width: collider.bounds.width,
+                    height: collider.bounds.height
+                });
+            }
+        }
 
-                const colliderB = entityB.getComponent(BoxCollider);
-                const positionB = entityB.getComponent(Position);
+        // Verifica colisões usando quadtree
+        for (const entity of entities) {
+            const collider = entity.getComponent(BoxCollider);
+            const position = entity.getComponent(Position);
 
-                colliderA.updateBounds({ position: positionA })
-                colliderB.updateBounds({ position: positionB })
+            if (collider) {
+                collider.updateBounds({ position });
+                
+                const rect = {
+                    x: collider.bounds.x,
+                    y: collider.bounds.y,
+                    width: collider.bounds.width,
+                    height: collider.bounds.height
+                };
 
-                if (Collider2D.BoxColliding(colliderA, colliderB)) {
-                    Physics.separateBoxColliders(entityA, entityB)
+                // Busca objetos próximos no quadtree
+                const nearbyObjects = this.quadtree.retrieve(rect);
+
+                for (const obj of nearbyObjects) {
+                    if (obj.entity !== entity) {
+                        const otherCollider = obj.entity.getComponent(BoxCollider);
+                        if (otherCollider && Collider2D.BoxColliding(collider, otherCollider)) {
+                            Physics.separateBoxColliders(entity, obj.entity);
+                        }
+                    }
                 }
             }
         }

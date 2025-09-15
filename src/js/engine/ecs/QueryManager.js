@@ -6,6 +6,7 @@ export class QueryManager {
     #entities = [];
     #entityVersion = 0;
     #maxCacheSize = 2048;
+    #keyCache = new Map(); // Cache para chaves de query
 
     constructor() {
         this.#entities = [];
@@ -25,15 +26,37 @@ export class QueryManager {
     }
 
     /**
-     * Gera uma chave única para a query baseada nos parâmetros
+     * Gera uma chave única para a query baseada nos parâmetros (otimizada)
      * @param {Object} queryConfig 
      * @returns {string}
      */
     #generateCacheKey(queryConfig) {
         const { class: classes, components } = queryConfig;
-        const classKey = classes ? classes.map(c => c.name).sort().join(',') : '';
-        const componentKey = components ? components.map(c => c.name).sort().join(',') : '';
-        return `${classKey}|${componentKey}`;
+        
+        // Gera chave simples baseada em contadores
+        const classCount = classes ? classes.length : 0;
+        const componentCount = components ? components.length : 0;
+        const key = `${classCount}-${componentCount}`;
+        
+        // Verifica cache de chaves
+        if (this.#keyCache.has(key)) {
+            return this.#keyCache.get(key);
+        }
+        
+        // Gera chave otimizada (sem sort para performance)
+        let classKey = '';
+        if (classes && classes.length > 0) {
+            classKey = classes.map(c => c.name).join(',');
+        }
+        
+        let componentKey = '';
+        if (components && components.length > 0) {
+            componentKey = components.map(c => c.name).join(',');
+        }
+        
+        const result = `${classKey}|${componentKey}`;
+        this.#keyCache.set(key, result);
+        return result;
     }
 
     /**
@@ -109,14 +132,20 @@ export class QueryManager {
     }
 
     /**
-     * Remove entradas do cache relacionadas a uma entidade específica
+     * Remove entradas do cache relacionadas a uma entidade específica (otimizada)
      * @param {Entity} entity 
      */
     invalidateEntity(entity) {
-        // Remove todas as entradas do cache que podem conter esta entidade
-        for (const [key, value] of this.#cache.entries()) {
-            if (value.includes(entity)) {
-                this.#cache.delete(key);
+        // Em vez de verificar cada entrada, simplesmente limpa o cache
+        // Isso é mais eficiente para muitas entidades
+        if (this.#cache.size > 100) {
+            this.#cache.clear();
+        } else {
+            // Para caches pequenos, verifica individualmente
+            for (const [key, value] of this.#cache.entries()) {
+                if (value.includes(entity)) {
+                    this.#cache.delete(key);
+                }
             }
         }
     }
