@@ -12,9 +12,11 @@ export class Position extends Classes(Vector2, Component) {
         this.previousPosition.set(x, y);
     }
 
-    move (direction, speed) {
+    move (direction, speed, deltaTime = 16.67) {
         this.previousPosition = this.clone()
 
-        this.add(direction.normalize().multiply(speed))
+        // Convert deltaTime from milliseconds to seconds and apply to movement
+        const deltaSeconds = deltaTime / 1000;
+        this.add(direction.normalize().multiply(speed * deltaSeconds))
     }
 }

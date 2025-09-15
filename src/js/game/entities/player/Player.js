@@ -4,11 +4,16 @@ import { Position } from "../../components/Position.js";
 import { Controllable } from "../../components/Tags/Controllable.js";
 import { RigidBody } from "../../components/RigidBody.js";
 import { Collidable } from "../../components/Tags/Collidable.js";
+import { Hittable } from "../../components/Hittable.js";
+import { HitBehavior } from "../../components/HitBehavior.js";
+import { HealthBar } from "../../components/HealthBar.js";
+import { Knockback } from "../../components/Knockback.js";
 import { Tooltip } from "../../components/Tooltip.js";
 import { Vector2 } from "../../../engine/support/Vectors/Vector2.js";
 import { Sprite } from "../../components/Sprite.js";
 import { BoxCollider } from "../../../engine/support/Collider/BoxCollider.js";
 import { toGridCell } from "../../utils/Utils.js";
+import { AppliesDamage } from "../../components/AppliesDamage.js";
 
 export class Player extends Entity {
     constructor(options) {
@@ -65,7 +70,6 @@ export class Player extends Entity {
                 ctx.save()
                 ctx.strokeStyle = 'black'
                 ctx.lineWidth = 1
-                // ctx.setLineDash([ 2, 2 ]);
                 ctx.strokeRect(x, y, width, height)
                 ctx.restore()
             }
@@ -92,6 +96,42 @@ export class Player extends Entity {
         }
 
         entity.addComponent(Collidable)
+        entity.addComponent(AppliesDamage, {
+            damage: 30
+        })
+
+        // Adiciona componente Hittable para o player poder ser atingido
+        entity.addComponent(Hittable, {
+            health: options.health || 100,
+            maxHealth: options.maxHealth || 100,
+            invulnerabilityDuration: options.invulnerabilityDuration || 500
+        })
+
+        // Adiciona comportamento de hit personalizado
+        entity.addComponent(HitBehavior, {
+            invulnerabilityDuration: 500, // 0.5 segundos
+            knockbackResistance: 0.2, // 20% de resistência ao knockback
+            canBeStunned: true,
+            stunDuration: 200 // 0.2 segundos de stun
+        })
+
+        // Adiciona health bar
+        entity.addComponent(HealthBar, {
+            width: 40,
+            height: 4,
+            offset: { x: -20, y: -25 },
+            healthColor: '#00ff00',
+            lowHealthColor: '#ff0000',
+            lowHealthThreshold: 0.3
+        })
+
+        // Adiciona knockback
+        entity.addComponent(Knockback, {
+            force: 2,
+            duration: 200,
+            resistance: 0.3, // 30% de resistência ao knockback
+            decayRate: 0.85
+        })
 
         return entity;
     }

@@ -1,5 +1,6 @@
 import { IterableWeakMap } from "../support/IterableWeakMap.js";
 import { Position } from "../../game/components/Position.js";
+import { QueryManager } from "./QueryManager.js";
 
 class ECSSystemManager {
     #systems = new IterableWeakMap();
@@ -55,22 +56,30 @@ class ECSEntityManager {
      * @type {Entity[]}
      */
     #entities = [];
+    
+    /**
+     * @type {Entity[]}
+     */
+    #destroyQueue = [];
 
     /**
-     * @param {Object.<string, {components: Component[], results: Entity[]}>} queries
+     * @type {QueryManager}
+     */
+    #queryManager = new QueryManager();
+
+    /**
+     * @param {Object.<string, {class?: Function[], components?: Component[], results?: Entity[]}>} queries
      */
     query(queries) {
-        // TODO: implement a QueryManager to cache queries
+        this.#queryManager.updateEntities(this.#entities);
+        
+        // Executa as queries usando o QueryManager
+        const results = this.#queryManager.query(queries);
+        
+        // Atualiza os resultados nas queries originais para compatibilidade
         for (const queryName in queries) {
             if (queries.hasOwnProperty(queryName)) {
-                const query = queries[queryName];
-
-                query.results = this.#entities
-                    .filter(
-                        (entity) => query.components.every(
-                            (component) => entity.hasComponent(component)
-                        )
-                    )
+                queries[queryName].results = results[queryName] || [];
             }
         }
 
@@ -88,6 +97,69 @@ class ECSEntityManager {
     add(...entities) {
         entities = entities.flat(Infinity);
         this.#entities.push(...entities);
+        // Invalida o cache quando entidades são adicionadas
+        this.#queryManager.clearCache();
+
+        return this;
+    }
+
+    remove(entity) {
+        const index = this.#entities.indexOf(entity);
+        if (index > -1) {
+            this.#entities.splice(index, 1);
+            // Invalida cache relacionado a esta entidade
+            this.#queryManager.invalidateEntity(entity);
+            return true;
+        }
+        return false;
+    }
+
+    removeById(id) {
+        const index = this.#entities.findIndex(entity => entity.id === id);
+        if (index > -1) {
+            const entity = this.#entities[index];
+            this.#entities.splice(index, 1);
+            // Invalida cache relacionado a esta entidade
+            this.#queryManager.invalidateEntity(entity);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Adiciona uma entidade à fila de destruição
+     * @param {Entity} entity 
+     */
+    queueDestroy(entity) {
+        if (!this.#destroyQueue.includes(entity)) {
+            this.#destroyQueue.push(entity);
+        }
+    }
+
+    /**
+     * Processa a fila de destruição, removendo as entidades
+     */
+    processDestroyQueue() {
+        for (const entity of this.#destroyQueue) {
+            this.remove(entity);
+            entity.destroyed = true;
+        }
+        this.#destroyQueue.length = 0; // Limpa a fila
+    }
+
+    /**
+     * Retorna estatísticas do cache de queries
+     * @returns {Object}
+     */
+    getQueryCacheStats() {
+        return this.#queryManager.getCacheStats();
+    }
+
+    /**
+     * Limpa o cache de queries
+     */
+    clearQueryCache() {
+        this.#queryManager.clearCache();
     }
 
     sort () {
@@ -111,6 +183,9 @@ export class ECS {
         this.sortEntitiesByLayer();
 
         this.systems.update(game, this.entities)
+        
+        // Processa a fila de destruição no final do frame
+        this.entities.processDestroyQueue();
     }
 
     fixedUpdate(game) {
@@ -119,5 +194,20 @@ export class ECS {
 
     sortEntitiesByLayer() {
         this.entities.sort()
+    }
+
+    /**
+     * Retorna estatísticas do cache de queries
+     * @returns {Object}
+     */
+    getQueryCacheStats() {
+        return this.entities.getQueryCacheStats();
+    }
+
+    /**
+     * Limpa o cache de queries
+     */
+    clearQueryCache() {
+        this.entities.clearQueryCache();
     }
 }

@@ -60,11 +60,11 @@ export class PlayerControllerSystem extends System {
 
             const {animationDirection, direction} = this.direction(input);
 
-            position.move(direction, rb.speed)
-
-            if (input.keyboard.isPressedForAction(InputConfig.getKeysForAction('RESET'))) {
-                position.set((canvas.width * 0.5), (canvas.height * 0.5))
+            if (input.keyboard.isPressedForAction(InputConfig.getKeysForAction('TOGGLE_RUN'))) {
+                rb.setRunning(!rb.isRunning)
             }
+
+            position.move(direction, rb.speed * time.deltaTime)
 
             if (sprite.direction !== animationDirection) {
                 const state = rb.isRunning ? 'run' : 'walk';

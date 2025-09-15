@@ -46,4 +46,16 @@ export class Entity {
             )
         )
     }
+
+    /**
+     * Destroi a entidade, adicionando-a à fila de destruição
+     */
+    destroy() {
+        if (game.ecs && game.ecs.entities) {
+            game.ecs.entities.queueDestroy(this);
+        }
+        
+        // Marca como marcada para destruição
+        this.markedForDestruction = true;
+    }
 }

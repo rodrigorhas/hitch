@@ -18,8 +18,7 @@ export class Vector2 {
     }
 
     static subtract(a, b) {
-        if (b instanceof Vector2) return new Vector2(a.x - b.x, a.y - b.y);
-        else return new Vector2(a.x - b, a.y - b);
+        return new Vector2(a.x - b.x, a.y - b.y);
     }
 
     static multiply(a, b) {
@@ -42,6 +41,12 @@ export class Vector2 {
 
     static cross(a, b) {
         return a.x * b.y - a.y * b.x;
+    }
+
+    static distance(a, b) {
+        const dx = a.x - b.x;
+        const dy = a.y - b.y;
+        return Math.sqrt(dx * dx + dy * dy);
     }
 
     negative() {
