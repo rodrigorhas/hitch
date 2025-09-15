@@ -2,6 +2,7 @@ import { System } from "../../engine/ecs/System.js";
 import { Position } from "../components/Position.js";
 import { Controllable } from "../components/Tags/Controllable.js";
 import { RigidBody } from "../components/RigidBody.js";
+import { SpeedBoost } from "../components/SpeedBoost.js";
 import { randomPlayers } from "../entities/player/Player.js";
 import { Sprite } from "../components/Sprite.js";
 import { Vector2 } from "../../engine/support/Vectors/Vector2.js";
@@ -55,6 +56,7 @@ export class PlayerControllerSystem extends System {
             const sprite = entity.getComponent(Sprite)
             const rb = entity.getComponent(RigidBody)
             const controllable = entity.getComponent(Controllable)
+            const speedBoost = entity.getComponent(SpeedBoost)
 
             if (!controllable) continue;
 
@@ -64,7 +66,13 @@ export class PlayerControllerSystem extends System {
                 rb.setRunning(!rb.isRunning)
             }
 
-            position.move(direction, rb.speed * time.deltaTime)
+            // Aplica speed boost se ativo
+            let speedMultiplier = 1;
+            if (speedBoost) {
+                speedMultiplier = speedBoost.update(time.deltaTime);
+            }
+
+            position.move(direction, rb.speed * speedMultiplier * time.deltaTime)
 
             if (sprite.direction !== animationDirection) {
                 const state = rb.isRunning ? 'run' : 'walk';

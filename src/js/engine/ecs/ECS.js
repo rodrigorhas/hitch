@@ -49,6 +49,10 @@ class ECSSystemManager {
             }
         }
     }
+
+    get(system) {
+        return this.#systems.get(system);
+    }
 }
 
 class ECSEntityManager {

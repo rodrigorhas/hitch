@@ -4,6 +4,13 @@
  */
 export class InputConfig {
     static KEY_MAPPINGS = {
+
+        // Skill keys
+        SKILL_1: ['1'],
+        SKILL_2: ['2'],
+        SKILL_3: ['3'],
+        SKILL_4: ['4'],
+
         // Movement keys
         MOVE_LEFT: ['a', 'A', 'ArrowLeft'],
         MOVE_RIGHT: ['d', 'D', 'ArrowRight'],

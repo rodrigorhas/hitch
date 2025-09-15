@@ -8,12 +8,12 @@ import { TooltipSystem } from "./systems/TooltipSystem.js";
 import { CollisionSystem } from "./systems/CollisionSystem.js";
 import { EnemyAISystem } from "./systems/EnemyAISystem.js";
 import { BlobRenderSystem } from "./systems/BlobRenderSystem.js";
-import { BoxRenderSystem } from "./systems/BoxRenderSystem.js";
 import { HealthBarSystem } from "./systems/HealthBarSystem.js";
 import { KnockbackSystem } from "./systems/KnockbackSystem.js";
+import { SkillSystem } from "./systems/SkillSystem.js";
+import { SkillRenderSystem } from "./systems/SkillRenderSystem.js";
 import { CombatSystem } from "./systems/CombatSystem.js";
 import { withGrid } from "./utils/Utils.js";
-import { randomNumber } from "../engine/support/Random.js";
 
 const entities = [
     Player.make({
@@ -109,9 +109,11 @@ game.ecs.systems
     .register(CombatSystem)
     .register(CollisionSystem)
     .register(KnockbackSystem)
+    .register(SkillSystem)
     .register(HealthBarSystem)
     .register(BlobRenderSystem)
     .register(SpriteRenderSystem)
+    .register(SkillRenderSystem)
     .register(TooltipSystem)
 
 function render(ctx) {
@@ -133,6 +135,14 @@ function render(ctx) {
         const cacheStats = game.ecs.getQueryCacheStats();
         ctx.fillStyle = cacheStats.cacheSize > cacheStats.maxCacheSize * 0.8 ? 'orange' : 'blue';
         ctx.fillText(`Cache: ${cacheStats.cacheSize}/${cacheStats.maxCacheSize} queries | Entities: ${cacheStats.entityCount}`, 10, 60);
+
+        // Show skill cooldowns
+        const skillSystem = game.ecs.systems.get(SkillSystem);
+        if (skillSystem) {
+            const cooldowns = skillSystem.getCooldownInfo();
+            ctx.fillStyle = 'red';
+            ctx.fillText(`Skills: 1(${Math.ceil(cooldowns.projectile/1000)}s) 2(${Math.ceil(cooldowns.speedBoost/1000)}s) 3(${Math.ceil(cooldowns.shield/1000)}s) 4(${Math.ceil(cooldowns.damageTrail/1000)}s)`, 10, 80);
+        }
 
         ctx.beginPath();
         ctx.arc(game.input.mouse.position.x, game.input.mouse.position.y, 2, 0, 2 * Math.PI)
