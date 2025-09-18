@@ -5,7 +5,7 @@ export class QueryManager {
     #cache = new Map();
     #entities = [];
     #entityVersion = 0;
-    #maxCacheSize = 2048;
+    #maxCacheSize = 500;
     #keyCache = new Map(); // Cache para chaves de query
 
     constructor() {
@@ -21,6 +21,7 @@ export class QueryManager {
         if (this.#entities.length !== entities.length || 
             !this.#entities.every((entity, index) => entity === entities[index])) {
             this.#entityVersion++;
+            console.log(`QueryManager: Versão das entidades atualizada para ${this.#entityVersion} (${entities.length} entidades)`);
         }
         this.#entities = entities;
     }
@@ -128,7 +129,9 @@ export class QueryManager {
      * Limpa o cache (útil quando entidades são adicionadas/removidas)
      */
     clearCache() {
+        const cacheSize = this.#cache.size;
         this.#cache.clear();
+        console.log(`QueryManager: Cache limpo (${cacheSize} entradas removidas)`);
     }
 
     /**

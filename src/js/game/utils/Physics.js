@@ -1,6 +1,7 @@
 import { Position } from "../components/Position.js";
 import { Vector2 } from "../../engine/support/Vectors/Vector2.js";
 import { BoxCollider } from "../../engine/support/Collider/BoxCollider.js";
+import { Controllable } from "../components/Tags/Controllable.js";
 
 export function separateBoxColliders(entityA, entityB) {
     // Assume each entity's Position is a Vector2 and it has a Collider component with width and height
@@ -22,17 +23,55 @@ export function separateBoxColliders(entityA, entityB) {
     // Adjust positions to resolve overlap
     // Ensure overlap is negative (indicating an actual overlap)
     if (overlapX < 0 && overlapY < 0) {
+        // Determine which entity should move (player moves, static objects don't)
+        const isPlayerA = entityA.getComponent(Controllable) !== undefined;
+        const isPlayerB = entityB.getComponent(Controllable) !== undefined;
+        const isBoxA = entityA.name && entityA.name.includes('Box');
+        const isBoxB = entityB.name && entityB.name.includes('Box');
+        
         // Determine the minimum amount of movement needed to resolve the overlap
         if (-overlapX < -overlapY) {
             // Horizontal collision, adjust along x-axis
             const adjustment = delta.x > 0 ? new Vector2(overlapX, 0) : new Vector2(-overlapX, 0);
-            posA.add(adjustment.divide(2)); // Move entityA half the overlap away
-            posB.subtract(adjustment.divide(2)); // Move entityB half the overlap away
+            
+            if (isPlayerA && !isPlayerB) {
+                // Only move the player
+                posA.add(adjustment);
+            } else if (isPlayerB && !isPlayerA) {
+                // Only move the player
+                posB.subtract(adjustment);
+            } else if (isPlayerA && isBoxB) {
+                // Player pushes box horizontally (allowed)
+                posA.add(adjustment);
+            } else if (isPlayerB && isBoxA) {
+                // Player pushes box horizontally (allowed)
+                posB.subtract(adjustment);
+            } else {
+                // Both are movable, move both half the distance
+                posA.add(adjustment.divide(2));
+                posB.subtract(adjustment.divide(2));
+            }
         } else {
             // Vertical collision, adjust along y-axis
             const adjustment = delta.y > 0 ? new Vector2(0, overlapY) : new Vector2(0, -overlapY);
-            posA.add(adjustment.divide(2)); // Move entityA half the overlap away
-            posB.subtract(adjustment.divide(2)); // Move entityB half the overlap away
+            
+            if (isPlayerA && !isPlayerB) {
+                // Only move the player
+                posA.add(adjustment);
+            } else if (isPlayerB && !isPlayerA) {
+                // Only move the player
+                posB.subtract(adjustment);
+            } else if (isPlayerA && isBoxB) {
+                // Player pushes box vertically (allowed)
+                posA.add(adjustment);
+            } else if (isPlayerB && isBoxA) {
+                // Player pushes box vertically (allowed)
+                posB.subtract(adjustment);
+            } else {
+                // Both are movable, move both half the distance
+                posA.add(adjustment.divide(2));
+                posB.subtract(adjustment.divide(2));
+            }
         }
     }
 }

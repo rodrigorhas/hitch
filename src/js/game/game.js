@@ -9,9 +9,13 @@ import { CollisionSystem } from "./systems/CollisionSystem.js";
 import { EnemyAISystem } from "./systems/EnemyAISystem.js";
 import { BlobRenderSystem } from "./systems/BlobRenderSystem.js";
 import { HealthBarSystem } from "./systems/HealthBarSystem.js";
+import { HoverHealthBarSystem } from "./systems/HoverHealthBarSystem.js";
 import { KnockbackSystem } from "./systems/KnockbackSystem.js";
 import { SkillSystem } from "./systems/SkillSystem.js";
 import { SkillRenderSystem } from "./systems/SkillRenderSystem.js";
+import { SkillBarSystem } from "./systems/SkillBarSystem.js";
+import { PredictiveCollisionSystem } from "./systems/PredictiveCollisionSystem.js";
+import { MovementSystem } from "./systems/MovementSystem.js";
 import { CombatSystem } from "./systems/CombatSystem.js";
 import { withGrid } from "./utils/Utils.js";
 
@@ -19,8 +23,8 @@ const entities = [
     Player.make({
         isControlled: true,
         name: 'Player',
-        walkSpeed: 10,
-        runningSpeed: 20,
+        walkSpeed: 120,
+        runningSpeed: 220,
         tooltip: {
             color: 'black',
         },
@@ -33,30 +37,13 @@ const entities = [
             y: withGrid(1)
         }
     }),
-    Player.make({
-        isControlled: false,
-        name: 'Player 2',
-        speed: 0.1,
-        tooltip: {
-            color: 'black',
-        },
-        dimension: {
-            width: 32,
-            height: 32,
-        },
-        position: {
-            x: withGrid(4),
-            y: withGrid(4)
-        }
-    }),
-    // Adiciona alguns blobs inimigos
     Blob.make({
         name: 'Blob 1',
-        health: 100,
+        health: 50,
         detectionRange: 100,
         attackRange: 20,
-        chaseSpeed: 3,
-        guardSpeed: 1,
+        chaseSpeed: 70,
+        guardSpeed: 40,
         tooltip: {
             color: 'red',
         },
@@ -71,11 +58,11 @@ const entities = [
     }),
     Blob.make({
         name: 'Blob 2',
-        health: 100,
+        health: 50,
         detectionRange: 100,
         attackRange: 20,
-        chaseSpeed: 3,
-        guardSpeed: 1,
+        chaseSpeed: 70,
+        guardSpeed: 40,
         tooltip: {
             color: 'red',
         },
@@ -105,20 +92,27 @@ game.ecs.entities
 
 game.ecs.systems
     .register(PlayerControllerSystem)
+    .register(PredictiveCollisionSystem)    
+    .register(MovementSystem)
     .register(EnemyAISystem)
     .register(CombatSystem)
-    .register(CollisionSystem)
     .register(KnockbackSystem)
     .register(SkillSystem)
     .register(HealthBarSystem)
+    .register(HoverHealthBarSystem)
     .register(BlobRenderSystem)
     .register(SpriteRenderSystem)
     .register(SkillRenderSystem)
+    .register(SkillBarSystem)
     .register(TooltipSystem)
 
+/**
+ * @param {CanvasRenderingContext2D} ctx 
+ */
 function render(ctx) {
     const text = 'Entities: ' + game.ecs.entities.count();
 
+    ctx.save()
     ctx.fillStyle = 'black'
     ctx.fillText(text, 10, 20, 60);
 
@@ -148,6 +142,8 @@ function render(ctx) {
         ctx.arc(game.input.mouse.position.x, game.input.mouse.position.y, 2, 0, 2 * Math.PI)
         ctx.fill()
         ctx.closePath()
+
+        ctx.restore()
     }
 }
 

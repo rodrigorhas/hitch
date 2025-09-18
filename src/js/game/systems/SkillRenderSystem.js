@@ -74,6 +74,10 @@ export class SkillRenderSystem extends System {
     renderDamageTrails(ctx) {
         const entitiesWithTrail = this.queries.entitiesWithTrail.results;
 
+        if (entitiesWithTrail.length > 0) {
+            console.log(`Rendering ${entitiesWithTrail.length} damage trails`);
+        }
+
         for (const entity of entitiesWithTrail) {
             const damageTrail = entity.getComponent(DamageTrail);
 

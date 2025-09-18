@@ -170,13 +170,15 @@ export class Blob extends Enemy {
                 color = '#4CAF50';
         }
 
-        ctx.translate(-dimension.width / 2, -dimension.height /2);
+        // Centraliza o desenho
+        const x = position.x - dimension.width / 2;
+        const y = position.y - dimension.height / 2;
 
         // Desenha a blob (círculo com borda)
         ctx.beginPath();
         ctx.arc(
-            position.x + dimension.width / 2, 
-            position.y + dimension.height / 2, 
+            position.x, 
+            position.y, 
             dimension.width / 2 - 2, 
             0, 
             2 * Math.PI
@@ -191,11 +193,11 @@ export class Blob extends Enemy {
         // Desenha olhos simples
         ctx.fillStyle = '#000';
         ctx.beginPath();
-        ctx.arc(position.x + dimension.width / 2 - 6, position.y + dimension.height / 2 - 2, 2, 0, 2 * Math.PI);
+        ctx.arc(position.x - 6, position.y - 2, 2, 0, 2 * Math.PI);
         ctx.fill();
         
         ctx.beginPath();
-        ctx.arc(position.x + dimension.width / 2 + 6, position.y + dimension.height / 2 - 2, 2, 0, 2 * Math.PI);
+        ctx.arc(position.x + 6, position.y - 2, 2, 0, 2 * Math.PI);
         ctx.fill();
         
         ctx.restore();

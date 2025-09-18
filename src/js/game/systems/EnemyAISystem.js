@@ -130,25 +130,31 @@ export class EnemyAISystem extends System {
     guardBehavior(enemy, deltaTime) {
         // Comportamento simples de guard - pode ser expandido para patrulha
         // Por enquanto, fica parado
+        const enemyRb = enemy.getComponent(RigidBody);
+        enemyRb.setVelocity(0, 0);
     }
 
     chaseBehavior(enemy, player, deltaTime) {
         const enemyPosition = enemy.getComponent(Position);
         const playerPosition = player.getComponent(Position);
+        const enemyRb = enemy.getComponent(RigidBody);
         
         // Calcula direção para o player
         const direction = Vector2.subtract(playerPosition, enemyPosition);
         
         // Verifica se a distância é zero (mesma posição)
         if (direction.length() === 0) {
+            enemyRb.setVelocity(0, 0);
             return; // Não se move se estiver na mesma posição
         }
         
         // Normaliza a direção
         direction.normalize();
         
-        // Move na direção do player
-        enemyPosition.move(direction, enemy.getComponent(RigidBody).speed * deltaTime);
+        // Define velocidade no RigidBody
+        const speed = enemyRb.speed;
+        const velocity = direction.multiply(speed);
+        enemyRb.setVelocity(velocity.x, velocity.y);
     }
 
     knockbackBehavior(enemy, enemyState, deltaTime) {

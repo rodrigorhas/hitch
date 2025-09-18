@@ -19,8 +19,7 @@ export class InputConfig {
         
         // Action keys
         INTERACT: ['e', 'E', 'Enter'],
-        JUMP: [' ', 'Space'],
-        ATTACK: ['x', 'X'],
+        ATTACK: [' ', 'Space'],
         DEFEND: ['z', 'Z'],
         
         // System keys

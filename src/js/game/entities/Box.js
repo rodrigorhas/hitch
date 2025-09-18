@@ -167,8 +167,9 @@ export class Box extends Entity {
     drawBox(ctx, position, dimension, hittable) {
         ctx.save();
 
-        const x = position.x;
-        const y = position.y;
+        // Centraliza o desenho
+        const x = position.x - dimension.width / 2;
+        const y = position.y - dimension.height / 2;
         const width = dimension.width;
         const height = dimension.height;
 

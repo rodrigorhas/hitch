@@ -6,16 +6,19 @@ import { SpeedBoost } from "../components/SpeedBoost.js";
 import { Shield } from "../components/Shield.js";
 import { DamageTrail } from "../components/DamageTrail.js";
 import { RigidBody } from "../components/RigidBody.js";
+import { Hittable } from "../components/Hittable.js";
+import { Knockback } from "../components/Knockback.js";
 import { Vector2 } from "../../engine/support/Vectors/Vector2.js";
 import { InputConfig } from "../../engine/managers/Input/InputConfig.js";
 import { Entity } from "../../engine/entities/Entity.js";
-import { Collidable } from "../components/Tags/Collidable.js";
 import { BoxCollider } from "../../engine/support/Collider/BoxCollider.js";
+import { Collider2D } from "../../engine/support/Collider/Collider2D.js";
+import { Player } from "../entities/player/Player.js";
 
 export class SkillSystem extends System {
     queries = {
         players: {
-            components: [ Controllable, Position, RigidBody ]
+            class: [Player]
         },
         projectiles: {
             components: [ Position, Projectile ]
@@ -44,8 +47,16 @@ export class SkillSystem extends System {
     };
 
     execute(game) {
-        const { input, time } = game;
+        const { time } = game;
         const deltaTime = time.deltaTime;
+
+        // Debug: Verifica se as queries estão sendo atualizadas
+        console.log('SkillSystem - Queries antes:', {
+            players: this.queries.players?.results?.length || 0,
+            projectiles: this.queries.projectiles?.results?.length || 0,
+            shields: this.queries.entitiesWithShield?.results?.length || 0,
+            trails: this.queries.entitiesWithTrail?.results?.length || 0
+        });
 
         // Atualiza cooldowns
         this.updateCooldowns(deltaTime);
@@ -126,11 +137,14 @@ export class SkillSystem extends System {
         const playerPosition = player.getComponent(Position);
         const mousePosition = game.input.mouse.position;
 
-        // Calcula direção do projétil em relação ao mouse
         const direction = Vector2.subtract(mousePosition, playerPosition).normalize();
 
-        // Cria o projétil
-        const projectile = this.createProjectile(playerPosition, direction);
+        // Offset para evitar colisão com o lançador
+        const offset = 30; // Distância do player
+        const startX = playerPosition.x + direction.x * offset;
+        const startY = playerPosition.y + direction.y * offset;
+
+        const projectile = this.createProjectile({ x: startX, y: startY }, direction, player);
         game.ecs.entities.add(projectile);
 
         this.skillCooldowns[1] = this.skillDurations[1];
@@ -147,6 +161,7 @@ export class SkillSystem extends System {
         if (!speedBoost) {
             speedBoost = new SpeedBoost();
             player.addComponent(SpeedBoost, speedBoost);
+            console.log('SpeedBoost component added to player');
         }
 
         const rigidBody = player.getComponent(RigidBody);
@@ -166,6 +181,7 @@ export class SkillSystem extends System {
         if (!shield) {
             shield = new Shield();
             player.addComponent(Shield, shield);
+            console.log('Shield component added to player');
         }
 
         shield.activate();
@@ -184,6 +200,7 @@ export class SkillSystem extends System {
         if (!damageTrail) {
             damageTrail = new DamageTrail();
             player.addComponent(DamageTrail, damageTrail);
+            console.log('DamageTrail component added to player');
         }
 
         damageTrail.activate();
@@ -194,11 +211,12 @@ export class SkillSystem extends System {
 
     /**
      * Cria um projétil
-     * @param {Position} startPosition - Posição inicial
+     * @param {Object} startPosition - Posição inicial {x, y}
      * @param {Vector2} direction - Direção do projétil
+     * @param {Entity} shooter - Entidade que disparou o projétil
      * @returns {Entity} - Entidade do projétil
      */
-    createProjectile(startPosition, direction) {
+    createProjectile(startPosition, direction, shooter) {
         const projectile = new Entity({
             name: 'Projectile',
             id: `projectile_${Date.now()}`
@@ -224,6 +242,9 @@ export class SkillSystem extends System {
             offset: { x: 0, y: 0 }
         });
 
+        // Armazena referência ao lançador para evitar auto-dano
+        projectile.shooter = shooter;
+
         return projectile;
     }
 
@@ -241,8 +262,75 @@ export class SkillSystem extends System {
 
             if (projectileComponent.update(deltaTime)) {
                 projectileComponent.move(position, deltaTime);
+                
+                // Verifica colisão com outras entidades
+                this.checkProjectileCollisions(projectile, game);
             } else {
                 projectile.destroy();
+            }
+        }
+    }
+
+    /**
+     * Verifica colisões do projétil com outras entidades
+     * @param {Entity} projectile - Entidade do projétil
+     * @param {Object} game - Instância do jogo
+     */
+    checkProjectileCollisions(projectile, game) {
+        const projectilePosition = projectile.getComponent(Position);
+        const projectileComponent = projectile.getComponent(Projectile);
+        const projectileCollider = projectile.getComponent(BoxCollider);
+
+        if (!projectileCollider) return;
+
+        // Busca todas as entidades que podem ser atingidas
+        const allEntities = game.ecs.entities.get();
+        
+        for (const entity of allEntities) {
+            // Pula o próprio projétil
+            if (entity === projectile) continue;
+            
+            // Pula o lançador do projétil (evita auto-dano)
+            if (entity === projectile.shooter) continue;
+            
+            // Pula entidades sem posição
+            const entityPosition = entity.getComponent(Position);
+            if (!entityPosition) continue;
+            
+            // Pula entidades sem collider
+            const entityCollider = entity.getComponent(BoxCollider);
+            if (!entityCollider) continue;
+            
+            // Verifica se a entidade pode ser atingida
+            const hittable = entity.getComponent(Hittable);
+            if (!hittable) continue;
+            
+            // Atualiza bounds dos colliders
+            projectileCollider.updateBounds({ position: projectilePosition });
+            entityCollider.updateBounds({ position: entityPosition });
+            
+            // Verifica colisão
+            if (Collider2D.BoxColliding(projectileCollider, entityCollider)) {
+                // Aplica dano
+                const damageDealt = hittable.takeDamage(projectileComponent.damage);
+                
+                if (damageDealt) {
+                    console.log(`Projectile hit ${entity.name} for ${projectileComponent.damage} damage!`);
+                    
+                    // Aplica knockback se a entidade tem componente Knockback
+                    const knockback = entity.getComponent(Knockback);
+                    if (knockback) {
+                        const direction = Vector2.subtract(entityPosition, projectilePosition);
+                        if (direction.length() > 0) {
+                            direction.normalize();
+                            knockback.applyKnockback(direction, 2, 200);
+                        }
+                    }
+                }
+                
+                // Destrói o projétil
+                projectile.destroy();
+                return; // Só pode acertar uma entidade por vez
             }
         }
     }

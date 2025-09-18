@@ -4,13 +4,13 @@ import { Vector2 } from "../../engine/support/Vectors/Vector2.js";
 export class Shield extends Component {
     health = 50;
     maxHealth = 50;
-    duration = 5000; // 5 segundos
+    duration = 5000;
     currentTime = 0;
     isActive = false;
     explosionRadius = 60;
     explosionDamage = 15;
     explosionKnockback = 5;
-    color = '#00ffff'; // Ciano
+    color = '#00ffff';
     pulseSpeed = 0.1;
     pulsePhase = 0;
 

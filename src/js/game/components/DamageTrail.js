@@ -1,5 +1,7 @@
 import { Component } from "../../engine/ecs/Component.js";
 import { Vector2 } from "../../engine/support/Vectors/Vector2.js";
+import { Hittable } from "./Hittable.js";
+import { Position } from "./Position.js";
 
 export class DamageTrail extends Component {
     damage = 1;

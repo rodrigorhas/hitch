@@ -103,6 +103,7 @@ class ECSEntityManager {
         this.#entities.push(...entities);
         // Invalida o cache quando entidades são adicionadas
         this.#queryManager.clearCache();
+        console.log(`ECS: Adicionadas ${entities.length} entidades, cache limpo`);
 
         return this;
     }
@@ -185,6 +186,9 @@ export class ECS {
 
     update(game) {
         this.sortEntitiesByLayer();
+
+        // Força invalidação do cache no início de cada frame para garantir que as queries sejam atualizadas
+        this.entities.clearQueryCache();
 
         this.systems.update(game, this.entities)
         

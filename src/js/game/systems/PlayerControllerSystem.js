@@ -72,7 +72,14 @@ export class PlayerControllerSystem extends System {
                 speedMultiplier = speedBoost.update(time.deltaTime);
             }
 
-            position.move(direction, rb.speed * speedMultiplier * time.deltaTime)
+            if (direction.length() > 0) {
+                const speed = rb.speed * speedMultiplier;
+                const velocity = direction.multiply(speed);
+
+                rb.setVelocity(velocity.x, velocity.y);
+            } else {
+                rb.setVelocity(0, 0);
+            }
 
             if (sprite.direction !== animationDirection) {
                 const state = rb.isRunning ? 'run' : 'walk';

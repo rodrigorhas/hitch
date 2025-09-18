@@ -9,7 +9,7 @@ export class HealthBar extends Component {
     borderColor = '#000000';
     healthColor = '#00ff00';
     lowHealthColor = '#ff0000';
-    lowHealthThreshold = 0.3; // 30% da vida
+    lowHealthThreshold = 0.3;
     showBorder = true;
     showBackground = true;
     animated = true; // Se a barra anima ao mudar de valor
