@@ -28,8 +28,9 @@ game.ecs.systems
     .register(CollisionSystem)
     // .register(KnockbackSystem)
     // .register(SkillSystem)
-    .register(HealthBarSystem)
     .register(BlobRenderSystem)
+    .register(HealthBarSystem)
+    
     .register(SpriteRenderSystem)
     // .register(SkillRenderSystem)
     .register(TooltipSystem)

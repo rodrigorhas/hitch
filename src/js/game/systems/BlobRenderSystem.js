@@ -21,10 +21,12 @@ export class BlobRenderSystem extends System {
             const sprite = entity.getComponent(Sprite);
             const position = entity.getComponent(Position);
             const enemyState = entity.getComponent(EnemyState);
-            const rangeIndicator = entity.getComponent(RangeIndicator);
-
-            // Desenha o indicador de alcance
-            rangeIndicator.draw(ctx, position, sprite.dimension);
+            
+            // Desenha todos os indicadores de alcance
+            const rangeIndicators = entity.getComponents(RangeIndicator);
+            for (const rangeIndicator of rangeIndicators) {
+                rangeIndicator.draw(ctx, position, sprite.dimension);
+            }
 
             // Desenha a blob customizada
             if (entity.drawBlob) {
