@@ -5,7 +5,7 @@ export class QueryManager {
     #cache = new Map();
     #entities = [];
     #entityVersion = 0;
-    #maxCacheSize = 2048;
+    #maxCacheSize = 500;
 
     constructor() {
         this.#entities = [];

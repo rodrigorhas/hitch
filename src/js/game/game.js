@@ -12,6 +12,8 @@ import { SkillSystem } from "./systems/SkillSystem.js";
 import { SkillRenderSystem } from "./systems/SkillRenderSystem.js";
 import { CombatSystem } from "./systems/CombatSystem.js";
 import { EntityRenderSystem } from './systems/EntityRenderSystem.js';
+import { SpatialPartitionSystem } from "./systems/SpatialPartitionSystem.js";
+import { QuadtreeDebugSystem } from "./systems/QuadtreeDebugSystem.js";
 
 import { BattleStage } from "./stages/BattleStage.js";
 
@@ -22,6 +24,7 @@ const game = new Engine({
 })
 
 game.ecs.systems
+    .register(SpatialPartitionSystem)
     .register(PlayerControllerSystem)
     .register(EnemyAISystem)
     // .register(CombatSystem)
@@ -35,6 +38,7 @@ game.ecs.systems
     // .register(SkillRenderSystem)
     .register(TooltipSystem)
     .register(EntityRenderSystem)
+    .register(QuadtreeDebugSystem)
 
 function render(ctx, alpha = 1.0) {
     ctx.save();
@@ -70,6 +74,10 @@ function render(ctx, alpha = 1.0) {
         ctx.fill()
         ctx.closePath()
 
+        // Mostra controles de debug do quadtree
+        ctx.fillStyle = 'purple';
+        ctx.fillText('Quadtree Debug: 8(toggle) 9(objects) 0(stats)', 10, 100);
+
         ctx.restore();
     }
 }
@@ -77,6 +85,28 @@ function render(ctx, alpha = 1.0) {
 function update() {
     if (game.input.keyboard.isButtonDown('.')) {
         game.debug = !game.debug;
+    }
+    
+    // Controles de debug do quadtree
+    if (game.input.keyboard.isButtonDown('8')) {
+        const debugSystem = game.ecs.systems.get(QuadtreeDebugSystem);
+        if (debugSystem) {
+            debugSystem.toggleQuadtree();
+        }
+    }
+    
+    if (game.input.keyboard.isButtonDown('9')) {
+        const debugSystem = game.ecs.systems.get(QuadtreeDebugSystem);
+        if (debugSystem) {
+            debugSystem.toggleObjects();
+        }
+    }
+    
+    if (game.input.keyboard.isButtonDown('0')) {
+        const debugSystem = game.ecs.systems.get(QuadtreeDebugSystem);
+        if (debugSystem) {
+            debugSystem.toggleStats();
+        }
     }
 }
 

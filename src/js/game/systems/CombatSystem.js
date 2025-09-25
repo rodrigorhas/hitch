@@ -11,6 +11,7 @@ import { Player } from "../entities/player/Player.js";
 import { Box } from "../entities/Box.js";
 import { Enemy } from "../entities/enemy/Enemy.js";
 import { AppliesDamage } from "../components/AppliesDamage.js";
+import { SpatialPartitionSystem } from "./SpatialPartitionSystem.js";
 
 export class CombatSystem extends System {
     useFixedUpdate = true; // Combate deve rodar em taxa fixa
@@ -38,51 +39,53 @@ export class CombatSystem extends System {
 
     fixedExecute(game) {
         const { input } = game;
+        
+        const spatialPartition = game.ecs.systems.get(SpatialPartitionSystem)
+
 
         // Atualiza componentes Hittable
         this.updateHittableComponents(game.time.fixedDeltaTime);
 
         // Verifica se o player está atacando (tecla X)
         if (input.keyboard.isPressedForAction(InputConfig.getKeysForAction('ATTACK'))) {
-            this.handlePlayerAttack();
+            this.handlePlayerAttack(spatialPartition);
         }
 
         // Atualiza cooldowns
         this.updateCooldowns(game.time.fixedDeltaTime);
     }
 
-    handlePlayerAttack() {
+    handlePlayerAttack(spatialPartition) {
         const players = this.queries.players.results;
-        const enemies = this.queries.enemies.results;
-        const boxes = this.queries.boxes.results;
 
         for (const player of players) {
             const playerPosition = player.getComponent(Position);
 
-            // Ataca inimigos
-            for (const enemy of enemies) {
-                const enemyPosition = enemy.getComponent(Position);
-                const distance = Vector2.distance(playerPosition, enemyPosition);
+            // Usa SpatialPartitionSystem para encontrar entidades próximas (raio de ataque = 30)
+            const nearbyEntities = spatialPartition.queryRadius(
+                playerPosition.x, 
+                playerPosition.y, 
+                30
+            );
 
-                // Se estão próximos o suficiente para atacar
-                if (distance < 30) {
-                    // Verifica se o inimigo pode ser atacado (cooldown)
-                    if (this.canAttackEnemy(enemy)) {
-                        // Aplica dano ao inimigo
-                        this.damageEnemy(enemy, player);
+            for (const entity of nearbyEntities) {
+                // Verifica se é um inimigo
+                if (entity instanceof Enemy) {
+                    const enemyPosition = entity.getComponent(Position);
+                    const distance = Vector2.distance(playerPosition, enemyPosition);
+
+                    if (distance < 30 && this.canAttackEnemy(entity)) {
+                        this.damageEnemy(entity, player);
                     }
                 }
-            }
+                // Verifica se é uma caixa
+                else if (entity instanceof Box) {
+                    const boxPosition = entity.getComponent(Position);
+                    const distance = Vector2.distance(playerPosition, boxPosition);
 
-            // Ataca caixas
-            for (const box of boxes) {
-                const boxPosition = box.getComponent(Position);
-                const distance = Vector2.distance(playerPosition, boxPosition);
-
-                // Se estão próximos o suficiente para atacar
-                if (distance < 30) {
-                    // Aplica dano à caixa
-                    this.damageBox(box, player);
+                    if (distance < 30) {
+                        this.damageBox(entity, player);
+                    }
                 }
             }
         }

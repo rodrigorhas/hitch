@@ -4,6 +4,7 @@ import { EnemyState } from "../components/EnemyState.js";
 import { RigidBody } from "../components/RigidBody.js";
 import { Controllable } from "../components/Tags/Controllable.js";
 import { Vector2 } from "../../engine/support/Vectors/Vector2.js";
+import { SpatialPartitionSystem } from "./SpatialPartitionSystem.js";
 
 export class EnemyAISystem extends System {
     useFixedUpdate = true; // IA e movimentação devem rodar em taxa fixa
@@ -20,9 +21,10 @@ export class EnemyAISystem extends System {
     fixedExecute(game) {
         const { time } = game;
         const deltaTime = time.fixedDeltaTime;
+        
+        const spatialPartition = game.ecs.systems.get(SpatialPartitionSystem)
 
         const enemies = this.queries.enemies.results;
-        const players = this.queries.players.results;
 
         for (const enemy of enemies) {
             const enemyPosition = enemy.getComponent(Position);
@@ -32,8 +34,8 @@ export class EnemyAISystem extends System {
             // Atualiza o estado do inimigo
             enemyState.update(deltaTime);
 
-            // Encontra o player mais próximo
-            const nearestPlayer = this.findNearestPlayer(enemyPosition, players);
+            // Encontra o player mais próximo usando SpatialPartitionSystem
+            const nearestPlayer = this.findNearestPlayer(enemyPosition, spatialPartition);
             
             if (nearestPlayer) {
                 const distance = Vector2.distance(enemyPosition, nearestPlayer.getComponent(Position));
@@ -50,21 +52,13 @@ export class EnemyAISystem extends System {
         }
     }
 
-    findNearestPlayer(enemyPosition, players) {
-        let nearestPlayer = null;
-        let minDistance = Infinity;
-
-        for (const player of players) {
-            const playerPosition = player.getComponent(Position);
-            const distance = Vector2.distance(enemyPosition, playerPosition);
-            
-            if (distance < minDistance) {
-                minDistance = distance;
-                nearestPlayer = player;
-            }
-        }
-
-        return nearestPlayer;
+    findNearestPlayer(enemyPosition, spatialPartition) {
+        return spatialPartition.findNearest(
+            enemyPosition.x, 
+            enemyPosition.y, 
+            1000, // Raio grande para encontrar todos os players
+            'player' // Filtra apenas players
+        );
     }
 
     updateEnemyState(enemyState, distance, player) {
