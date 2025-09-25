@@ -17,7 +17,7 @@ export class EnemyAISystem extends System {
         }
     }
 
-    execute(game) {
+    fixedExecute(game) {
         const { time } = game;
         const deltaTime = time.fixedDeltaTime;
 

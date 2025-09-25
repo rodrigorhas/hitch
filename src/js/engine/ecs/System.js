@@ -34,4 +34,11 @@ export class System {
 
     execute(engine) {
     }
+
+    /**
+     * Método específico para fixed updates (física, movimento, etc.)
+     * @param {Engine} engine
+     */
+    fixedExecute(engine) {
+    }
 }

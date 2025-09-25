@@ -14,9 +14,7 @@ export class CollisionSystem extends System {
         }
     }
 
-    execute(game) {
-        const { canvas } = game;
-
+    fixedExecute(game) {
         const entities = this.queries.entities.results;
 
         for (let i = 0; i < entities.length; i++) {

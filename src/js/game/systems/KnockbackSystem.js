@@ -11,7 +11,7 @@ export class KnockbackSystem extends System {
         }
     }
 
-    execute(game) {
+    fixedExecute(game) {
         const deltaTime = game.time.fixedDeltaTime;
         const entities = this.queries.entitiesWithKnockback.results;
 

@@ -1,7 +1,5 @@
-import { Player, randomPlayers } from './entities/player/Player.js'
-import { Blob } from './entities/enemy/Blob.js'
-import { Box } from './entities/Box.js'
 import { Engine } from "../engine/Engine.js";
+
 import { SpriteRenderSystem } from "./systems/SpriteRenderSystem.js";
 import { PlayerControllerSystem } from "./systems/PlayerControllerSystem.js";
 import { TooltipSystem } from "./systems/TooltipSystem.js";
@@ -13,80 +11,15 @@ import { KnockbackSystem } from "./systems/KnockbackSystem.js";
 import { SkillSystem } from "./systems/SkillSystem.js";
 import { SkillRenderSystem } from "./systems/SkillRenderSystem.js";
 import { CombatSystem } from "./systems/CombatSystem.js";
-import { withGrid } from "./utils/Utils.js";
 import { EntityRenderSystem } from './systems/EntityRenderSystem.js';
 
-const entities = [
-    Player.make({
-        isControlled: true,
-        name: 'Player',
-        walkSpeed: 2,
-        runningSpeed: 4.5,
-        tooltip: {
-            color: 'black',
-        },
-        dimension: {
-            width: 32,
-            height: 32,
-        },
-        position: {
-            x: withGrid(0),
-            y: withGrid(0)
-        }
-    }),
-    // Adiciona alguns blobs inimigos
-    // Blob.make({
-    //     name: 'Blob 1',
-    //     health: 100,
-    //     detectionRange: 100,
-    //     attackRange: 20,
-    //     chaseSpeed: 1.5,
-    //     guardSpeed: 0.8,
-    //     tooltip: {
-    //         color: 'red',
-    //     },
-    //     dimension: {
-    //         width: 24,
-    //         height: 24,
-    //     },
-    //     position: {
-    //         x: withGrid(4),
-    //         y: withGrid(4)
-    //     }
-    // }),
-    // Blob.make({
-    //     name: 'Blob 2',
-    //     health: 100,
-    //     detectionRange: 100,
-    //     attackRange: 20,
-    //     chaseSpeed: 1.5,
-    //     guardSpeed: 0.8,
-    //     tooltip: {
-    //         color: 'red',
-    //     },
-    //     dimension: {
-    //         width: 24,
-    //         height: 24,
-    //     },
-    //     position: {
-    //         x: withGrid(4),
-    //         y: withGrid(3)
-    //     }
-    // }),
-];
+import { BattleStage } from "./stages/BattleStage.js";
 
 const game = new Engine({
     element: 'canvas',
     render,
     update,
 })
-
-// Adiciona caixas aleatoriamente pelo mapa
-const boxes = Box.randomBoxes(game, 2);
-
-game.ecs.entities
-    .add(entities)
-    .add(boxes)
 
 game.ecs.systems
     .register(PlayerControllerSystem)
@@ -146,8 +79,9 @@ function update() {
     }
 }
 
-game.start()
+BattleStage(game)
 
+game.start()
 game.debug = true;
 
 window.game = game;

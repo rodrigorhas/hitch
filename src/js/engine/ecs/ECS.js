@@ -45,7 +45,7 @@ class ECSSystemManager {
         for (const system of systems) {
             if (system.useFixedUpdate) {
                 system.prepareExecution(entities)
-                system.execute(game)
+                system.fixedExecute(game)
             }
         }
     }

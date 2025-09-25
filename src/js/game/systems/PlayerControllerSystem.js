@@ -47,8 +47,8 @@ export class PlayerControllerSystem extends System {
         };
     }
 
-    execute(game) {
-        const { canvas, input, time } = game;
+    fixedExecute(game) {
+        const { input, time } = game;
 
         /** @type {Player[]|*} */
         const entities = this.queries.players.results;

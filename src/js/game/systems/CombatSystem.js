@@ -36,7 +36,7 @@ export class CombatSystem extends System {
     // Cooldown de ataque por inimigo
     enemyAttackCooldowns = new Map();
 
-    execute(game) {
+    fixedExecute(game) {
         const { input } = game;
 
         // Atualiza componentes Hittable
