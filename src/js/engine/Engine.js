@@ -1,5 +1,6 @@
 import { Input } from './managers/Input.js'
 import { Time } from "./managers/Time.js";
+import { Interpolation } from "./managers/Interpolation.js";
 import { ECS } from "./ecs/ECS.js";
 import { noop } from "../game/utils/Utils.js";
 
@@ -35,6 +36,7 @@ export class Engine {
 
         this.#configureTime()
         this.#configureInput()
+        this.#configureInterpolation()
         this.#configureECS()
 
         this.state = {
@@ -46,19 +48,30 @@ export class Engine {
     gameLoop(canvas) {
         canvas.clearCanvas()
 
+        // Fixed update para física e lógica de jogo
         this.time.fixedUpdate(() => {
             this.ecs.fixedUpdate(this)
             this.#fixedUpdate.call(this)
         })
 
+        // Update variável para renderização e interpolação
         this.time.update(() => {
             this.ecs.update(this)
 
             this.#update.call(this)
             this.input.update(this)
 
-            this.#render.call(this, canvas.ctx)
+            // Calcula fator de interpolação
+            const alpha = this.calculateInterpolationAlpha()
+
+            this.#render.call(this, canvas.ctx, alpha)
         })
+    }
+
+    calculateInterpolationAlpha() {
+        const now = performance.now();
+        const timeSinceLastFixedUpdate = now - this.time.lastFixedUpdateTime;
+        return Math.min(timeSinceLastFixedUpdate / this.time.fixedDeltaTimeMs, 1.0);
     }
 
     start() {
@@ -114,6 +127,12 @@ export class Engine {
     #configureCanvas() {
         const { canvas, context, clearCanvas } = this.createCanvas()
 
+        const ratio = window.devicePixelRatio;
+        canvas.width = canvas.width * ratio;
+        canvas.height = canvas.height * ratio;
+
+        context.scale(ratio, ratio);
+        
         canvas.clearCanvas = clearCanvas;
         canvas.ctx = context;
 
@@ -126,6 +145,10 @@ export class Engine {
 
     #configureInput() {
         this.input = this.input || new Input();
+    }
+
+    #configureInterpolation() {
+        this.interpolation = this.interpolation || new Interpolation();
     }
 
     #configureECS() {

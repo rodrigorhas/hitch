@@ -13,6 +13,8 @@ import { Enemy } from "../entities/enemy/Enemy.js";
 import { AppliesDamage } from "../components/AppliesDamage.js";
 
 export class CombatSystem extends System {
+    useFixedUpdate = true; // Combate deve rodar em taxa fixa
+    
     queries = {
         players: {
             class: [ Player ],
@@ -38,7 +40,7 @@ export class CombatSystem extends System {
         const { input } = game;
 
         // Atualiza componentes Hittable
-        this.updateHittableComponents(game.time.deltaTime);
+        this.updateHittableComponents(game.time.fixedDeltaTime);
 
         // Verifica se o player está atacando (tecla X)
         if (input.keyboard.isPressedForAction(InputConfig.getKeysForAction('ATTACK'))) {
@@ -46,7 +48,7 @@ export class CombatSystem extends System {
         }
 
         // Atualiza cooldowns
-        this.updateCooldowns(game.time.deltaTime);
+        this.updateCooldowns(game.time.fixedDeltaTime);
     }
 
     handlePlayerAttack() {

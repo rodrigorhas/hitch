@@ -41,34 +41,17 @@ export class Box extends Entity {
 
         const { dimension, tooltip, position } = options;
 
-        // Sprite - usando uma cor sólida para simular uma caixa
-        entity.addComponent(Sprite, {
-            image: {
-                src: null, // Vamos desenhar programaticamente
-                cropSize: 32,
-            },
-            dimension,
-            position,
-            animationFrameLimit: 16,
-            animations: {
-                'idle': [ [0, 0] ],
-                'damaged': [ [0, 0] ],
-                'broken': [ [0, 0] ],
-            },
-            customDraw: true // Flag para indicar que vamos desenhar customizado
-        });
-
         // Collider
         entity.addComponent(BoxCollider, {
-            width: Math.floor(dimension.width * 0.9),
-            height: Math.floor(dimension.height * 0.9),
-            offset: { x: 1, y: 1 },
+            width: dimension.width,
+            height: dimension.height,
+            offset: { x: 0, y: 0 },
             onDrawDebug(ctx) {
                 const { x, y, width, height } = this.bounds;
 
                 ctx.save()
                 ctx.strokeStyle = 'brown'
-                ctx.lineWidth = 2
+                ctx.lineWidth = 1
                 ctx.strokeRect(x, y, width, height)
                 ctx.restore()
             }
@@ -102,7 +85,7 @@ export class Box extends Entity {
         entity.addComponent(HealthBar, {
             width: 25,
             height: 3,
-            offset: { x: -12, y: -18 },
+            offset: { x: 4, y: -6 },
             healthColor: '#8B4513', // Marrom
             lowHealthColor: '#A0522D', // Marrom claro
             lowHealthThreshold: 0.5
@@ -164,7 +147,11 @@ export class Box extends Entity {
     }
 
     // Método para desenhar a caixa customizada
-    drawBox(ctx, position, dimension, hittable) {
+    render(ctx) {
+        const position = this.getComponent(Position);
+        const dimension = this.getComponent(BoxCollider).bounds;
+        const hittable = this.getComponent(Hittable);
+
         ctx.save();
 
         const x = position.x;
@@ -181,46 +168,12 @@ export class Box extends Entity {
             borderColor = '#8B4513';
         }
 
-        // Desenha a caixa
-        ctx.fillStyle = boxColor;
-        ctx.fillRect(x, y, width, height);
-
-        // Desenha a borda
-        ctx.strokeStyle = borderColor;
-        ctx.lineWidth = 2;
-        ctx.strokeRect(x, y, width, height);
-
-        // Desenha linhas para simular madeira
-        ctx.strokeStyle = borderColor;
-        ctx.lineWidth = 1;
-        
-        // Linha horizontal no meio
-        ctx.beginPath();
-        ctx.moveTo(x + 2, y + height / 2);
-        ctx.lineTo(x + width - 2, y + height / 2);
-        ctx.stroke();
-
-        // Linha vertical no meio
-        ctx.beginPath();
-        ctx.moveTo(x + width / 2, y + 2);
-        ctx.lineTo(x + width / 2, y + height - 2);
-        ctx.stroke();
-
-        // Se quebrada, desenha rachaduras
-        if (this.state.broken) {
-            ctx.strokeStyle = '#000000';
-            ctx.lineWidth = 1;
-            
-            // Rachaduras diagonais
-            ctx.beginPath();
-            ctx.moveTo(x + 4, y + 4);
-            ctx.lineTo(x + width - 4, y + height - 4);
-            ctx.moveTo(x + width - 4, y + 4);
-            ctx.lineTo(x + 4, y + height - 4);
-            ctx.stroke();
-        }
-
-        ctx.restore();
+        ctx.save()
+        ctx.strokeStyle = 'black'
+        ctx.lineWidth = 2
+        ctx.setLineDash([ 2, 2 ]);
+        ctx.strokeRect(x, y, width, height)
+        ctx.restore()
     }
 
     // Método para quebrar a caixa

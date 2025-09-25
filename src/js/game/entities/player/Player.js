@@ -63,7 +63,7 @@ export class Player extends Entity {
         entity.addComponent(BoxCollider, {
             width: Math.floor(dimension.width * 0.5),
             height: Math.floor(dimension.height * 0.5),
-            offset: { y: 8 },
+            offset: { y: 0, x: -8 },
             onDrawDebug (ctx) {
                 const { x, y, width, height } = this.bounds;
 

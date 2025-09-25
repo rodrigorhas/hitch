@@ -14,13 +14,14 @@ import { SkillSystem } from "./systems/SkillSystem.js";
 import { SkillRenderSystem } from "./systems/SkillRenderSystem.js";
 import { CombatSystem } from "./systems/CombatSystem.js";
 import { withGrid } from "./utils/Utils.js";
+import { EntityRenderSystem } from './systems/EntityRenderSystem.js';
 
 const entities = [
     Player.make({
         isControlled: true,
         name: 'Player',
-        walkSpeed: 10,
-        runningSpeed: 20,
+        walkSpeed: 2,
+        runningSpeed: 4.5,
         tooltip: {
             color: 'black',
         },
@@ -29,65 +30,49 @@ const entities = [
             height: 32,
         },
         position: {
-            x: withGrid(1),
-            y: withGrid(1)
-        }
-    }),
-    Player.make({
-        isControlled: false,
-        name: 'Player 2',
-        speed: 0.1,
-        tooltip: {
-            color: 'black',
-        },
-        dimension: {
-            width: 32,
-            height: 32,
-        },
-        position: {
-            x: withGrid(4),
-            y: withGrid(4)
+            x: withGrid(0),
+            y: withGrid(0)
         }
     }),
     // Adiciona alguns blobs inimigos
-    Blob.make({
-        name: 'Blob 1',
-        health: 100,
-        detectionRange: 100,
-        attackRange: 20,
-        chaseSpeed: 3,
-        guardSpeed: 1,
-        tooltip: {
-            color: 'red',
-        },
-        dimension: {
-            width: 24,
-            height: 24,
-        },
-        position: {
-            x: withGrid(4),
-            y: withGrid(4)
-        }
-    }),
-    Blob.make({
-        name: 'Blob 2',
-        health: 100,
-        detectionRange: 100,
-        attackRange: 20,
-        chaseSpeed: 3,
-        guardSpeed: 1,
-        tooltip: {
-            color: 'red',
-        },
-        dimension: {
-            width: 24,
-            height: 24,
-        },
-        position: {
-            x: withGrid(4),
-            y: withGrid(3)
-        }
-    }),
+    // Blob.make({
+    //     name: 'Blob 1',
+    //     health: 100,
+    //     detectionRange: 100,
+    //     attackRange: 20,
+    //     chaseSpeed: 1.5,
+    //     guardSpeed: 0.8,
+    //     tooltip: {
+    //         color: 'red',
+    //     },
+    //     dimension: {
+    //         width: 24,
+    //         height: 24,
+    //     },
+    //     position: {
+    //         x: withGrid(4),
+    //         y: withGrid(4)
+    //     }
+    // }),
+    // Blob.make({
+    //     name: 'Blob 2',
+    //     health: 100,
+    //     detectionRange: 100,
+    //     attackRange: 20,
+    //     chaseSpeed: 1.5,
+    //     guardSpeed: 0.8,
+    //     tooltip: {
+    //         color: 'red',
+    //     },
+    //     dimension: {
+    //         width: 24,
+    //         height: 24,
+    //     },
+    //     position: {
+    //         x: withGrid(4),
+    //         y: withGrid(3)
+    //     }
+    // }),
 ];
 
 const game = new Engine({
@@ -97,7 +82,7 @@ const game = new Engine({
 })
 
 // Adiciona caixas aleatoriamente pelo mapa
-const boxes = Box.randomBoxes(game, 15);
+const boxes = Box.randomBoxes(game, 2);
 
 game.ecs.entities
     .add(entities)
@@ -105,18 +90,20 @@ game.ecs.entities
 
 game.ecs.systems
     .register(PlayerControllerSystem)
-    .register(EnemyAISystem)
-    .register(CombatSystem)
+    // .register(EnemyAISystem)
+    // .register(CombatSystem)
     .register(CollisionSystem)
-    .register(KnockbackSystem)
-    .register(SkillSystem)
+    // .register(KnockbackSystem)
+    // .register(SkillSystem)
     .register(HealthBarSystem)
-    .register(BlobRenderSystem)
+    // .register(BlobRenderSystem)
     .register(SpriteRenderSystem)
-    .register(SkillRenderSystem)
+    // .register(SkillRenderSystem)
     .register(TooltipSystem)
+    .register(EntityRenderSystem)
 
-function render(ctx) {
+function render(ctx, alpha = 1.0) {
+    ctx.save();
     const text = 'Entities: ' + game.ecs.entities.count();
 
     ctx.fillStyle = 'black'
@@ -148,16 +135,14 @@ function render(ctx) {
         ctx.arc(game.input.mouse.position.x, game.input.mouse.position.y, 2, 0, 2 * Math.PI)
         ctx.fill()
         ctx.closePath()
+
+        ctx.restore();
     }
 }
 
 function update() {
     if (game.input.keyboard.isButtonDown('.')) {
         game.debug = !game.debug;
-    }
-
-    if (game.input.keyboard.isButtonDown(',')) {
-        game.ecs.entities.add(randomPlayers(game, 1, 3))
     }
 }
 

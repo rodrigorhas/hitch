@@ -3,6 +3,8 @@ import { Position } from "../components/Position.js";
 import { Knockback } from "../components/Knockback.js";
 
 export class KnockbackSystem extends System {
+    useFixedUpdate = true; // Knockback deve rodar em taxa fixa
+    
     queries = {
         entitiesWithKnockback: {
             components: [ Position, Knockback ]
@@ -10,7 +12,7 @@ export class KnockbackSystem extends System {
     }
 
     execute(game) {
-        const deltaTime = game.time.deltaTime;
+        const deltaTime = game.time.fixedDeltaTime;
         const entities = this.queries.entitiesWithKnockback.results;
 
         for (const entity of entities) {

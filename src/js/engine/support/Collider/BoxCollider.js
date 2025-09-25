@@ -23,8 +23,8 @@ export class BoxCollider extends Collider {
 
     updateBounds({ position }) {
         this.bounds = {
-            x: position.x - (this.bounds.width * 0.5) + this.offset.x,
-            y: position.y - (this.bounds.height * 0.5) + this.offset.y,
+            x: position.x + this.offset.x,
+            y: position.y + this.offset.y,
             width: this.bounds.width,
             height: this.bounds.height
         }

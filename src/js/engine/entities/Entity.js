@@ -58,4 +58,7 @@ export class Entity {
         // Marca como marcada para destruição
         this.markedForDestruction = true;
     }
+
+    render (ctx) {
+    }
 }

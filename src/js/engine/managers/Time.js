@@ -4,9 +4,18 @@ export class Time {
     lastUpdate = 0;
     timeScale = 1;
     deltaTime = 16.67; // Default 60 FPS delta time
+    fixedDeltaTime = 16.67; // Fixed delta time for physics (60 FPS)
 
     #lastFixedUpdateTime = 0;
     #fixedDeltaTime = 1000 / 60; // 60 updates per second in milliseconds
+    
+    get lastFixedUpdateTime() {
+        return this.#lastFixedUpdateTime;
+    }
+    
+    get fixedDeltaTimeMs() {
+        return this.#fixedDeltaTime;
+    }
     #lowPowerMode = false;
     #frameCount = 0;
     #lastFpsCheck = 0;
@@ -22,11 +31,12 @@ export class Time {
 
         if (timeSinceLastFixedUpdate >= this.#fixedDeltaTime) {
             while (this.#lastFixedUpdateTime < now - this.#fixedDeltaTime) {
+                // Define o deltaTime fixo para sistemas de física
+                this.fixedDeltaTime = this.#fixedDeltaTime * this.timeScale;
                 run();
                 this.#lastFixedUpdateTime += this.#fixedDeltaTime;
             }
         }
-
     }
 
     update(run) {

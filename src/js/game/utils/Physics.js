@@ -3,36 +3,58 @@ import { Vector2 } from "../../engine/support/Vectors/Vector2.js";
 import { BoxCollider } from "../../engine/support/Collider/BoxCollider.js";
 
 export function separateBoxColliders(entityA, entityB) {
-    // Assume each entity's Position is a Vector2 and it has a Collider component with width and height
-
+    // Get position and collider bounds for both entities
     const posA = entityA.getComponent(Position);
     const colA = entityA.getComponent(BoxCollider).getBounds();
     const posB = entityB.getComponent(Position);
     const colB = entityB.getComponent(BoxCollider).getBounds();
 
-    // Calculate the centers of each entity
-    const centerA = new Vector2(posA.x + colA.width / 2, posA.y + colA.height / 2);
-    const centerB = new Vector2(posB.x + colB.width / 2, posB.y + colB.height / 2);
+    // Calculate the overlap on each axis using AABB intersection
+    const leftA = colA.x;
+    const rightA = colA.x + colA.width;
+    const topA = colA.y;
+    const bottomA = colA.y + colA.height;
 
-    // Calculate the overlap on each axis
-    const delta = Vector2.subtract(centerB, centerA);
-    const overlapX = Math.abs(delta.x) - (colA.width / 2 + colB.width / 2);
-    const overlapY = Math.abs(delta.y) - (colA.height / 2 + colB.height / 2);
+    const leftB = colB.x;
+    const rightB = colB.x + colB.width;
+    const topB = colB.y;
+    const bottomB = colB.y + colB.height;
 
-    // Adjust positions to resolve overlap
-    // Ensure overlap is negative (indicating an actual overlap)
-    if (overlapX < 0 && overlapY < 0) {
-        // Determine the minimum amount of movement needed to resolve the overlap
-        if (-overlapX < -overlapY) {
-            // Horizontal collision, adjust along x-axis
-            const adjustment = delta.x > 0 ? new Vector2(overlapX, 0) : new Vector2(-overlapX, 0);
-            posA.add(adjustment.divide(2)); // Move entityA half the overlap away
-            posB.subtract(adjustment.divide(2)); // Move entityB half the overlap away
+    // Check if there's an overlap
+    const overlapX = Math.min(rightA, rightB) - Math.max(leftA, leftB);
+    const overlapY = Math.min(bottomA, bottomB) - Math.max(topA, topB);
+
+    // Only resolve if there's actually an overlap
+    if (overlapX > 0 && overlapY > 0) {
+        // Determine which axis has the smaller overlap
+        if (overlapX < overlapY) {
+            // Resolve horizontal overlap
+            const centerA = leftA + colA.width / 2;
+            const centerB = leftB + colB.width / 2;
+            
+            if (centerA < centerB) {
+                // EntityA is to the left, move it further left
+                posA.x -= overlapX / 2;
+                posB.x += overlapX / 2;
+            } else {
+                // EntityA is to the right, move it further right
+                posA.x += overlapX / 2;
+                posB.x -= overlapX / 2;
+            }
         } else {
-            // Vertical collision, adjust along y-axis
-            const adjustment = delta.y > 0 ? new Vector2(0, overlapY) : new Vector2(0, -overlapY);
-            posA.add(adjustment.divide(2)); // Move entityA half the overlap away
-            posB.subtract(adjustment.divide(2)); // Move entityB half the overlap away
+            // Resolve vertical overlap
+            const centerA = topA + colA.height / 2;
+            const centerB = topB + colB.height / 2;
+            
+            if (centerA < centerB) {
+                // EntityA is above, move it further up
+                posA.y -= overlapY / 2;
+                posB.y += overlapY / 2;
+            } else {
+                // EntityA is below, move it further down
+                posA.y += overlapY / 2;
+                posB.y -= overlapY / 2;
+            }
         }
     }
 }

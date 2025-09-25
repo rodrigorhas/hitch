@@ -6,6 +6,8 @@ import { Controllable } from "../components/Tags/Controllable.js";
 import { Vector2 } from "../../engine/support/Vectors/Vector2.js";
 
 export class EnemyAISystem extends System {
+    useFixedUpdate = true; // IA e movimentação devem rodar em taxa fixa
+    
     queries = {
         enemies: {
             components: [ EnemyState, Position, RigidBody ]
@@ -17,7 +19,7 @@ export class EnemyAISystem extends System {
 
     execute(game) {
         const { time } = game;
-        const deltaTime = time.deltaTime;
+        const deltaTime = time.fixedDeltaTime;
 
         const enemies = this.queries.enemies.results;
         const players = this.queries.players.results;

@@ -6,6 +6,8 @@ import {Collider2D} from "../../engine/support/Collider/Collider2D.js";
 import Physics from "../utils/Physics.js";
 
 export class CollisionSystem extends System {
+    useFixedUpdate = true; // Física deve rodar em taxa fixa
+    
     queries = {
         entities: {
             components: [ Collidable, Position ]

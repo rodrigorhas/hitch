@@ -9,6 +9,8 @@ import { Vector2 } from "../../engine/support/Vectors/Vector2.js";
 import { InputConfig } from "../../engine/managers/Input/InputConfig.js";
 
 export class PlayerControllerSystem extends System {
+    useFixedUpdate = true; // Movimentação deve rodar em taxa fixa
+    
     queries = {
         players: {
             components: [ Controllable, RigidBody, Position, Sprite ]
@@ -69,10 +71,10 @@ export class PlayerControllerSystem extends System {
             // Aplica speed boost se ativo
             let speedMultiplier = 1;
             if (speedBoost) {
-                speedMultiplier = speedBoost.update(time.deltaTime);
+                speedMultiplier = speedBoost.update(time.fixedDeltaTime);
             }
 
-            position.move(direction, rb.speed * speedMultiplier * time.deltaTime)
+            position.move(direction, rb.speed * speedMultiplier * time.fixedDeltaTime)
 
             if (sprite.direction !== animationDirection) {
                 const state = rb.isRunning ? 'run' : 'walk';
