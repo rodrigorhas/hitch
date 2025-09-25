@@ -59,15 +59,15 @@ export class Blob extends Enemy {
 
         // Collider
         entity.addComponent(BoxCollider, {
-            width: Math.floor(dimension.width * 0.8),
-            height: Math.floor(dimension.height * 0.8),
-            offset: { x: 2, y: 2 },
+            width: dimension.width,
+            height: dimension.height,
+            offset: { x: 0, y: 0 },
             onDrawDebug(ctx) {
                 const { x, y, width, height } = this.bounds;
 
                 ctx.save()
                 ctx.strokeStyle = 'red'
-                ctx.lineWidth = 2
+                ctx.lineWidth = 1
                 ctx.strokeRect(x, y, width, height)
                 ctx.restore()
             }
@@ -96,6 +96,13 @@ export class Blob extends Enemy {
             range: options.detectionRange || 50,
             color: 'rgba(255, 0, 0, 0.1)',
             borderColor: 'rgba(255, 0, 0, 0.3)',
+            show: true
+        });
+
+        entity.addComponent(RangeIndicator, {
+            range: options.attackRange || 20,
+            color: 'rgba(0, 255, 0, 0.1)',
+            borderColor: 'rgba(0, 255, 0, 0.3)',
             show: true
         });
 
@@ -130,7 +137,7 @@ export class Blob extends Enemy {
         entity.addComponent(HealthBar, {
             width: 30,
             height: 3,
-            offset: { x: -15, y: -20 },
+            offset: { x: -2, y: -8 },
             healthColor: '#ff6600',
             lowHealthColor: '#ff0000',
             lowHealthThreshold: 0.4
@@ -170,8 +177,6 @@ export class Blob extends Enemy {
                 color = '#4CAF50';
         }
 
-        ctx.translate(-dimension.width / 2, -dimension.height /2);
-
         // Desenha a blob (círculo com borda)
         ctx.beginPath();
         ctx.arc(
@@ -185,7 +190,7 @@ export class Blob extends Enemy {
         ctx.fillStyle = color;
         ctx.fill();
         ctx.strokeStyle = '#333';
-        ctx.lineWidth = 2;
+        ctx.lineWidth = 1;
         ctx.stroke();
         
         // Desenha olhos simples

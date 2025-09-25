@@ -23,13 +23,13 @@ const game = new Engine({
 
 game.ecs.systems
     .register(PlayerControllerSystem)
-    // .register(EnemyAISystem)
+    .register(EnemyAISystem)
     // .register(CombatSystem)
     .register(CollisionSystem)
     // .register(KnockbackSystem)
     // .register(SkillSystem)
     .register(HealthBarSystem)
-    // .register(BlobRenderSystem)
+    .register(BlobRenderSystem)
     .register(SpriteRenderSystem)
     // .register(SkillRenderSystem)
     .register(TooltipSystem)

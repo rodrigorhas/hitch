@@ -86,7 +86,7 @@ export class Box extends Entity {
             width: 25,
             height: 3,
             offset: { x: 4, y: -6 },
-            healthColor: '#8B4513', // Marrom
+            healthColor: 'red', // Marrom
             lowHealthColor: '#A0522D', // Marrom claro
             lowHealthThreshold: 0.5
         })
